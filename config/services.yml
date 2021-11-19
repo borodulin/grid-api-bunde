@@ -1,0 +1,51 @@
+parameters:
+  env(GRID_API_EXPAND_KEY): 'expand'
+  env(GRID_API_FILTER_KEY): 'filter'
+  env(GRID_API_SORT_KEY): 'sort'
+  env(GRID_API_PAGE_KEY): 'page'
+  env(GRID_API_PAGE_SIZE_KEY): 'page_size'
+  env(GRID_API_DEFAULT_PAGE_SIZE): '25'
+
+  grid_api.expand_key: '%env(GRID_API_EXPAND_KEY)%'
+  grid_api.filter_key: '%env(GRID_API_FILTER_KEY)%'
+  grid_api.sort_key: '%env(GRID_API_SORT_KEY)%'
+  grid_api.page_key: '%env(GRID_API_PAGE_KEY)%'
+  grid_api.page_size_key: '%env(GRID_API_PAGE_SIZE_KEY)%'
+  grid_api.default_page_size: '%env(GRID_API_DEFAULT_PAGE_SIZE)%'
+
+services:
+  _defaults:
+    autowire: true
+
+  Borodulin\Bundle\GridApiBundle\ArgumentResolver\EntityApiResolver:
+    tags:
+      - { name: controller.argument_value_resolver, priority: 50 }
+    arguments:
+      $expandKey: '%grid_api.expand_key%'
+
+  Borodulin\Bundle\GridApiBundle\ArgumentResolver\GridApiResolver:
+    tags:
+      - { name: controller.argument_value_resolver, priority: 50 }
+    arguments:
+      $expandKey: '%grid_api.expand_key%'
+      $pageKey: '%grid_api.page_key%'
+      $pageSizeKey: '%grid_api.page_size_key%'
+      $sortKey: '%grid_api.sort_key%'
+      $defaultPageSize: '%grid_api.default_page_size%'
+
+  Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry: ~
+  Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry: ~
+
+  Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityExpand:
+    arguments:
+      $normalizer: '@serializer'
+
+  Borodulin\Bundle\GridApiBundle\GridApi\EntityApi: ~
+  Borodulin\Bundle\GridApiBundle\GridApi\EntityApiInterface: '@Borodulin\Bundle\GridApiBundle\GridApi\EntityApi'
+
+  Borodulin\Bundle\GridApiBundle\GridApi\GridApi: ~
+  Borodulin\Bundle\GridApiBundle\GridApi\GridApiInterface: '@Borodulin\Bundle\GridApiBundle\GridApi\GridApi'
+
+  doctrine_entity_normalizer:
+    class: Borodulin\Bundle\GridApiBundle\Serializer\DoctrineEntityNormalizer
+    tags: [ serializer.normalizer ]
