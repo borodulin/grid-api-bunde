@@ -29,8 +29,11 @@ class EntityConverterRegistry
             $class = get_parent_class($class);
         }
 
-        return null === $scenario ? $this->converters[ScenarioInterface::SCENARIO_DEFAULT][$class] :
-            $this->converters[$scenario][$class] ?? $this->converters[ScenarioInterface::SCENARIO_DEFAULT][$class] ?? null;
+        return null === $scenario
+            ? $this->converters[ScenarioInterface::SCENARIO_DEFAULT][$class] ?? null
+            : $this->converters[$scenario][$class]
+                ?? $this->converters[ScenarioInterface::SCENARIO_DEFAULT][$class]
+                ?? null;
     }
 
     public function getCustomSortFieldsForClass(string $class, ?string $scenario = null): ?CustomSortInterface
