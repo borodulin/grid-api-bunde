@@ -50,11 +50,13 @@ class EntityRecursiveExpander
     ) {
         $className = \get_class($entity);
 
+        $nameConverter = $scenario ? $scenario->getNameConverter() : $this->scenario->getNameConverter();
+
         $converter = $this->entityConverterRegistry->getConverterForClass($className, $scenario);
 
         if (null === $converter) {
             if ($this->normalizer->supportsNormalization($entity)) {
-                $result = $this->normalizer->normalize($entity);
+                $result = $this->normalizer->normalize($entity, null, ['nameConverter' => $nameConverter]);
             } else {
                 return $entity;
             }
@@ -105,8 +107,6 @@ class EntityRecursiveExpander
                 unset($expand[$key]);
             }
         }
-
-        $nameConverter = $scenario ? $scenario->getNameConverter() : $this->scenario->getNameConverter();
 
         foreach ($expand as $expandItem) {
             $denormalizedNames = array_map(

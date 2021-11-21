@@ -4,89 +4,65 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\Serializer;
 
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
-use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class DoctrineEntityNormalizer extends AbstractObjectNormalizer
+class DoctrineEntityNormalizer implements NormalizerInterface
 {
     private PropertyAccessExtractorInterface $propertyAccessExtractor;
     private PropertyAccessorInterface $propertyAccessor;
     private EntityConverterRegistry $entityConverterRegistry;
     private MetadataRegistry $metadataRegistry;
+    private ?NameConverterInterface $nameConverter;
 
     public function __construct(
         MetadataRegistry $metadataRegistry,
         PropertyAccessExtractorInterface $propertyAccessExtractor,
         PropertyAccessorInterface $propertyAccessor,
         EntityConverterRegistry $entityConverterRegistry,
-        ClassMetadataFactoryInterface $classMetadataFactory = null,
-        NameConverterInterface $nameConverter = null,
-        PropertyTypeExtractorInterface $propertyTypeExtractor = null,
-        ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
-        callable $objectClassResolver = null,
-        array $defaultContext = []
+        ?NameConverterInterface $nameConverter = null
     ) {
         $this->metadataRegistry = $metadataRegistry;
         $this->propertyAccessExtractor = $propertyAccessExtractor;
         $this->propertyAccessor = $propertyAccessor;
         $this->entityConverterRegistry = $entityConverterRegistry;
-
-        parent::__construct(
-            $classMetadataFactory,
-            $nameConverter,
-            $propertyTypeExtractor,
-            $classDiscriminatorResolver,
-            $objectClassResolver,
-            $defaultContext
-        );
+        $this->nameConverter = $nameConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null): bool
     {
-        return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
+        if (\is_object($data)) {
+            $class = \get_class($data);
+
+            return null === $this->entityConverterRegistry->getConverterForClass($class)
+                && null !== $this->metadataRegistry->getMetadataForClass($class);
+        }
+
+        return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function normalize($object, string $format = null, array $context = [])
     {
-        return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
-    }
+        $data = [];
 
-    protected function extractAttributes(object $object, string $format = null, array $context = []): array
-    {
         $class = \get_class($object);
 
-        return array_filter(
+        $attributes = array_filter(
             $this->metadataRegistry->getMetadataForClass($class)->getFieldNames(),
             fn ($fieldName) => $this->propertyAccessExtractor->isReadable($class, $fieldName),
         );
-    }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
-    {
-        return $this->propertyAccessor->getValue($object, $attribute);
-    }
+        $nameConverter = $context['nameConverter'] ?? $this->nameConverter;
 
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
-    {
-        $this->propertyAccessor->setValue($object, $attribute, $value);
-    }
+        foreach ($attributes as $attribute) {
+            $normalizedName = $nameConverter ? $nameConverter->normalize($attribute) : $attribute;
+            $data[$normalizedName] = $this->propertyAccessor->getValue($object, $attribute);
+        }
 
-    private function supports(string $class): bool
-    {
-        return null === $this->entityConverterRegistry->getConverterForClass($class)
-         && null !== $this->metadataRegistry->getMetadataForClass($class);
+        return \count($data) ? $data : new \ArrayObject();
     }
 }
