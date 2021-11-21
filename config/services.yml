@@ -52,6 +52,8 @@ services:
 
   grid_api_bundle.entity_converter.scenario:
     class: Borodulin\Bundle\GridApiBundle\EntityConverter\Scenario
+    arguments:
+      $name: 'default'
 
   Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface: '@grid_api_bundle.entity_converter.scenario'
 
