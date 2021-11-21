@@ -8,15 +8,15 @@ use Doctrine\Persistence\Proxy;
 
 class EntityConverterRegistry
 {
-    private array $converters;
+    private array $converters = [];
 
     /**
-     * @param EntityConverterInterface[]|ScenarioInterface[] $converters
+     * @param EntityConverterInterface[]|ScenarioInterface[] $diConverters
      */
     public function __construct(
-        array $converters = []
+        array $diConverters = []
     ) {
-        foreach ($converters as $class => $converter) {
+        foreach ($diConverters as $class => $converter) {
             $scenario = is_subclass_of($converter, ScenarioInterface::class) ?
                 $converter::getScenario() : ScenarioInterface::SCENARIO_DEFAULT;
             $this->converters[$scenario][$class] = $converter;
