@@ -4,22 +4,25 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityExpand;
+use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityRecursiveExpander;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestInterface;
 
 class EntityApi implements EntityApiInterface
 {
-    private ?string $scenario = null;
+    private ?ScenarioInterface $scenario;
     private ?ExpandRequestInterface $expandRequest = null;
-    private EntityExpand $entityExpand;
+    private EntityRecursiveExpander $entityExpand;
 
     public function __construct(
-        EntityExpand $entityExpand
+        EntityRecursiveExpander $entityExpand,
+        ScenarioInterface $scenario
     ) {
         $this->entityExpand = $entityExpand;
+        $this->scenario = $scenario;
     }
 
-    public function setScenario(?string $scenario): EntityApiInterface
+    public function setScenario(ScenarioInterface $scenario): EntityApiInterface
     {
         $this->scenario = $scenario;
 

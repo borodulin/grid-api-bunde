@@ -6,7 +6,7 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi\Pagination;
 
 use Doctrine\ORM\QueryBuilder;
 
-class Pagination
+class Paginator
 {
     public function paginate(
         PaginationRequestInterface $paginationRequest,

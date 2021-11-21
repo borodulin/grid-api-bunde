@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\EntityConverter;
 
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+
 interface ScenarioInterface
 {
-    public const SCENARIO_DEFAULT = 'default';
+    public function getName(): string;
 
-    public static function getScenario(): string;
+    public function getNameConverter(): NameConverterInterface;
 }

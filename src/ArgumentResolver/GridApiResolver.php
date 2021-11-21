@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
 
 use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityExpand;
+use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityRecursiveExpander;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\GridApi;
@@ -24,11 +25,13 @@ class GridApiResolver implements ArgumentValueResolverInterface
     private string $pageSizeKey;
     private string $sortKey;
     private int $defaultPageSize;
-    private EntityExpand $entityExpand;
+    private EntityRecursiveExpander $entityExpand;
+    private ScenarioInterface $scenario;
 
     public function __construct(
         EntityConverterRegistry $entityConverterRegistry,
-        EntityExpand $entityExpand,
+        EntityRecursiveExpander $entityExpand,
+        ScenarioInterface $scenario,
         string $expandKey,
         string $pageKey,
         string $pageSizeKey,
@@ -36,12 +39,13 @@ class GridApiResolver implements ArgumentValueResolverInterface
         int $defaultPageSize
     ) {
         $this->entityConverterRegistry = $entityConverterRegistry;
+        $this->entityExpand = $entityExpand;
+        $this->scenario = $scenario;
         $this->expandKey = $expandKey;
         $this->pageKey = $pageKey;
         $this->pageSizeKey = $pageSizeKey;
         $this->sortKey = $sortKey;
         $this->defaultPageSize = $defaultPageSize;
-        $this->entityExpand = $entityExpand;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
@@ -81,6 +85,7 @@ class GridApiResolver implements ArgumentValueResolverInterface
         yield (new GridApi(
             $this->entityConverterRegistry,
             $this->entityExpand,
+            $this->scenario,
             $this->defaultPageSize
         ))
             ->setExpandRequest($expandRequest)

@@ -36,15 +36,24 @@ services:
   Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry: ~
   Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry: ~
 
-  Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityExpand:
+  Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityRecursiveExpander:
     arguments:
       $normalizer: '@serializer'
 
-  Borodulin\Bundle\GridApiBundle\GridApi\EntityApi: ~
-  Borodulin\Bundle\GridApiBundle\GridApi\EntityApiInterface: '@Borodulin\Bundle\GridApiBundle\GridApi\EntityApi'
+  grid_api_bundle.entity_converter.entity_api:
+    class: Borodulin\Bundle\GridApiBundle\GridApi\EntityApi
 
-  Borodulin\Bundle\GridApiBundle\GridApi\GridApi: ~
-  Borodulin\Bundle\GridApiBundle\GridApi\GridApiInterface: '@Borodulin\Bundle\GridApiBundle\GridApi\GridApi'
+  Borodulin\Bundle\GridApiBundle\GridApi\EntityApiInterface: 'grid_api_bundle.entity_converter.entity_api'
+
+  grid_api_bundle.entity_converter.grid_api:
+    class: Borodulin\Bundle\GridApiBundle\GridApi\GridApi
+
+  Borodulin\Bundle\GridApiBundle\GridApi\GridApiInterface: 'grid_api_bundle.entity_converter.grid_api'
+
+  grid_api_bundle.entity_converter.scenario:
+    class: Borodulin\Bundle\GridApiBundle\EntityConverter\Scenario
+
+  Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface: 'grid_api_bundle.entity_converter.scenario'
 
   doctrine_entity_normalizer:
     class: Borodulin\Bundle\GridApiBundle\Serializer\DoctrineEntityNormalizer

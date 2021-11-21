@@ -7,6 +7,7 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi\Expand;
 use Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\CustomExpandInterface;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
+use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Doctrine\Common\Collections\Collection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -14,15 +15,15 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class EntityExpand
+class EntityRecursiveExpander
 {
     private EntityConverterRegistry $entityConverterRegistry;
     private NormalizerInterface $normalizer;
     private PropertyAccessorInterface $propertyAccessor;
     private PropertyAccessExtractorInterface $propertyAccessExtractor;
     private MetadataRegistry $metadataRegistry;
-    private ?NameConverterInterface $nameConverter;
     private LoggerInterface $logger;
+    private ScenarioInterface $scenario;
 
     public function __construct(
         EntityConverterRegistry $entityConverterRegistry,
@@ -30,22 +31,22 @@ class EntityExpand
         PropertyAccessExtractorInterface $propertyAccessExtractor,
         NormalizerInterface $normalizer,
         MetadataRegistry $metadataRegistry,
-        LoggerInterface $logger,
-        ?NameConverterInterface $nameConverter = null
+        ScenarioInterface $scenario,
+        LoggerInterface $logger
     ) {
         $this->entityConverterRegistry = $entityConverterRegistry;
         $this->normalizer = $normalizer;
         $this->propertyAccessor = $propertyAccessor;
         $this->propertyAccessExtractor = $propertyAccessExtractor;
         $this->metadataRegistry = $metadataRegistry;
-        $this->nameConverter = $nameConverter;
         $this->logger = $logger;
+        $this->scenario = $scenario;
     }
 
     public function expand(
         object $entity,
         array $expand,
-        ?string $scenario = null
+        ?ScenarioInterface $scenario = null
     ) {
         $className = \get_class($entity);
 
@@ -58,7 +59,7 @@ class EntityExpand
                 return $entity;
             }
         } elseif (\is_callable($converter)) {
-            $result = \call_user_func($converter, $entity);
+            $result = \call_user_func($converter, $entity, $scenario);
         } else {
             $this->logger->debug('Invalid converter', ['entity' => \get_class($entity)]);
 
@@ -104,9 +105,12 @@ class EntityExpand
                 unset($expand[$key]);
             }
         }
+
+        $nameConverter = $scenario ? $scenario->getNameConverter() : $this->scenario->getNameConverter();
+
         foreach ($expand as $expandItem) {
             $denormalizedNames = array_map(
-                [$this, 'denormalize'],
+                fn ($item) => $this->denormalize($item, $nameConverter),
                 explode('.', $expandItem)
             );
             $denormalizedName = array_shift($denormalizedNames);
@@ -118,14 +122,14 @@ class EntityExpand
         }
 
         foreach ($expandTree as $expandName => $nestedExpand) {
-            $normalizedName = $this->normalize($expandName);
+            $normalizedName = $this->normalize($expandName, $nameConverter);
             $nestedExpand = array_values($nestedExpand);
             if (\array_key_exists($expandName, $expandableFields)) {
                 $expandableField = $expandableFields[$expandName];
                 if (\is_string($expandableField)) {
                     $expandName = $expandableField;
                 } elseif (\is_callable($expandableField)) {
-                    $normalizedName = $this->normalize($expandName);
+                    $normalizedName = $this->normalize($expandName, $nameConverter);
                     $value = \call_user_func($expandableField, $entity, $scenario);
                     if (\is_object($value)) {
                         if ($value instanceof Collection) {
@@ -169,13 +173,13 @@ class EntityExpand
         return $result;
     }
 
-    private function normalize(string $propertyName): string
+    private function normalize(string $propertyName, NameConverterInterface $nameConverter): string
     {
-        return $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
+        return $nameConverter->normalize($propertyName);
     }
 
-    private function denormalize(string $propertyName): string
+    private function denormalize(string $propertyName, NameConverterInterface $nameConverter): string
     {
-        return $this->nameConverter ? $this->nameConverter->denormalize($propertyName) : $propertyName;
+        return $nameConverter->denormalize($propertyName);
     }
 }

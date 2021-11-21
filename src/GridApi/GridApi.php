@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
 use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityExpand;
+use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityRecursiveExpander;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\Filter;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\Pagination;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationRequest;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationRequestInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationResponseInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Sort\Sort;
+use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\Paginator;
+use Borodulin\Bundle\GridApiBundle\GridApi\Sort\Sorter;
 use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortRequestInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -30,11 +31,12 @@ class GridApi implements GridApiInterface
 
     public function __construct(
         EntityConverterRegistry $entityConverterRegistry,
-        EntityExpand $entityExpand,
+        EntityRecursiveExpander $entityExpand,
+        ScenarioInterface $scenario,
         int $defaultPageSize
     ) {
         $this->defaultPageSize = $defaultPageSize;
-        $this->entityApi = new EntityApi($entityExpand);
+        $this->entityApi = new EntityApi($entityExpand, $scenario);
         $this->entityConverterRegistry = $entityConverterRegistry;
     }
 
@@ -66,7 +68,7 @@ class GridApi implements GridApiInterface
         return $this;
     }
 
-    public function setScenario(?string $scenario): GridApiInterface
+    public function setScenario(?ScenarioInterface $scenario): GridApiInterface
     {
         $this->entityApi->setScenario($scenario);
 
@@ -78,7 +80,7 @@ class GridApi implements GridApiInterface
         $qbClone = clone $queryBuilder;
 
         if (null !== $this->sortRequest) {
-            $qbClone = (new Sort($this->entityConverterRegistry))
+            $qbClone = (new Sorter($this->entityConverterRegistry))
                 ->sort($this->sortRequest, $qbClone);
         }
         if (null !== $this->filterRequest) {
@@ -96,7 +98,7 @@ class GridApi implements GridApiInterface
 
         $queryBuilder = $this->prepareQuery($queryBuilder);
 
-        return (new Pagination())
+        return (new Paginator())
             ->paginate(
                 $paginationRequest,
                 $queryBuilder,

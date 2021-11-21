@@ -10,7 +10,7 @@ use Borodulin\Bundle\GridApiBundle\Serializer\LowerCaseNameConverter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-class Sort
+class Sorter
 {
     private NameConverterInterface $nameConverter;
     private EntityConverterRegistry $entityConverterRegistry;
