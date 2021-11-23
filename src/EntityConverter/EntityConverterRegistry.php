@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\EntityConverter;
 
+use Borodulin\Bundle\GridApiBundle\GridApi\Filter\CustomFilterInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Sort\CustomSortInterface;
 use Doctrine\Persistence\Proxy;
 
 class EntityConverterRegistry
