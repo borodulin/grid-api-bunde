@@ -7,26 +7,26 @@ namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\EntityApi;
 use Borodulin\Bundle\GridApiBundle\GridApi\EntityApiInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityRecursiveExpander;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class EntityApiResolver implements ArgumentValueResolverInterface
 {
     private string $expandKey;
-    private EntityRecursiveExpander $entityExpand;
     private ScenarioInterface $scenario;
+    private NormalizerInterface $normalizer;
 
     public function __construct(
-        EntityRecursiveExpander $entityExpand,
         ScenarioInterface $scenario,
+        NormalizerInterface $normalizer,
         string $expandKey
     ) {
         $this->expandKey = $expandKey;
-        $this->entityExpand = $entityExpand;
         $this->scenario = $scenario;
+        $this->normalizer = $normalizer;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
@@ -47,7 +47,7 @@ class EntityApiResolver implements ArgumentValueResolverInterface
     {
         $expandRequest = ExpandRequestFactory::tryCreateFromInputBug($request->query, $this->expandKey);
 
-        yield (new EntityApi($this->entityExpand, $this->scenario))
+        yield (new EntityApi($this->normalizer, $this->scenario))
             ->setExpandRequest($expandRequest)
         ;
     }

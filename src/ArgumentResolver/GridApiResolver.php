@@ -6,7 +6,6 @@ namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
 
 use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityRecursiveExpander;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\GridApi;
@@ -16,6 +15,7 @@ use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class GridApiResolver implements ArgumentValueResolverInterface
 {
@@ -25,13 +25,13 @@ class GridApiResolver implements ArgumentValueResolverInterface
     private string $pageSizeKey;
     private string $sortKey;
     private int $defaultPageSize;
-    private EntityRecursiveExpander $entityExpand;
     private ScenarioInterface $scenario;
+    private NormalizerInterface $normalizer;
 
     public function __construct(
         EntityConverterRegistry $entityConverterRegistry,
-        EntityRecursiveExpander $entityExpand,
         ScenarioInterface $scenario,
+        NormalizerInterface $normalizer,
         string $expandKey,
         string $pageKey,
         string $pageSizeKey,
@@ -39,13 +39,13 @@ class GridApiResolver implements ArgumentValueResolverInterface
         int $defaultPageSize
     ) {
         $this->entityConverterRegistry = $entityConverterRegistry;
-        $this->entityExpand = $entityExpand;
         $this->scenario = $scenario;
         $this->expandKey = $expandKey;
         $this->pageKey = $pageKey;
         $this->pageSizeKey = $pageSizeKey;
         $this->sortKey = $sortKey;
         $this->defaultPageSize = $defaultPageSize;
+        $this->normalizer = $normalizer;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
@@ -84,8 +84,8 @@ class GridApiResolver implements ArgumentValueResolverInterface
 
         yield (new GridApi(
             $this->entityConverterRegistry,
-            $this->entityExpand,
             $this->scenario,
+            $this->normalizer,
             $this->defaultPageSize
         ))
             ->setExpandRequest($expandRequest)

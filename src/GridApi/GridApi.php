@@ -6,7 +6,6 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
 use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\EntityRecursiveExpander;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\Filter;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestInterface;
@@ -17,6 +16,7 @@ use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\Paginator;
 use Borodulin\Bundle\GridApiBundle\GridApi\Sort\Sorter;
 use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortRequestInterface;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class GridApi implements GridApiInterface
 {
@@ -31,12 +31,12 @@ class GridApi implements GridApiInterface
 
     public function __construct(
         EntityConverterRegistry $entityConverterRegistry,
-        EntityRecursiveExpander $entityExpand,
         ScenarioInterface $scenario,
+        NormalizerInterface $normalizer,
         int $defaultPageSize
     ) {
         $this->defaultPageSize = $defaultPageSize;
-        $this->entityApi = new EntityApi($entityExpand, $scenario);
+        $this->entityApi = new EntityApi($normalizer, $scenario);
         $this->entityConverterRegistry = $entityConverterRegistry;
     }
 
