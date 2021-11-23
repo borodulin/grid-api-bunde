@@ -39,6 +39,8 @@ class EntityConverterFactoryPass implements CompilerPassInterface
                             throw new \RuntimeException(sprintf('Invalid converter handler: argument "$%s" of method "%s::__invoke()" must have a type-hint corresponding to the object class it handles.', $parameters[0]->getName(), $reflection->getName()));
                         }
                         $converters[$type] = new Reference($class);
+                    } else {
+                        throw new \RuntimeException(sprintf('Invalid converter handler: method "%s::__invoke()" should be implemented. ', $reflection->getName()));
                     }
                 }
             }
