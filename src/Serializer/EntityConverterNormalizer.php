@@ -38,7 +38,7 @@ class EntityConverterNormalizer implements NormalizerInterface
     {
         $data = [];
 
-        $class = \get_class($data);
+        $class = \get_class($object);
 
         $scenario = $context['scenario'] ?? $this->scenario;
         $nameConverter = $scenario->getNameConverter();
