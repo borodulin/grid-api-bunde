@@ -36,11 +36,36 @@ class EntityConverterNormalizer implements NormalizerInterface
 
     public function normalize($object, string $format = null, array $context = [])
     {
+        $result = $this->expand(
+            $object,
+            $context['expand'] ?? [],
+            $context['scenario'] ?? $this->scenario
+        );
+
+        return \count($result) ? $result : new \ArrayObject();
+    }
+
+    public function supportsNormalization($data, string $format = null): bool
+    {
+        if (\is_object($data)) {
+            $class = \get_class($data);
+
+            return null !== $this->entityConverterRegistry->getConverterForClass($class)
+                || null !== $this->metadataRegistry->getMetadataForClass($class);
+        }
+
+        return false;
+    }
+
+    public function expand(
+        object $object,
+        array $expand,
+        ScenarioInterface $scenario
+    ): array {
         $data = [];
 
         $class = \get_class($object);
 
-        $scenario = $context['scenario'] ?? $this->scenario;
         $nameConverter = $scenario->getNameConverter();
 
         $converter = $this->entityConverterRegistry->getConverterForClass($class, $scenario);
@@ -73,39 +98,6 @@ class EntityConverterNormalizer implements NormalizerInterface
         foreach ($data as $name => $value) {
             $result[$nameConverter->normalize($name)] = $value;
         }
-
-        $expand = $context['expand'] ?? null;
-        if (\is_array($expand)) {
-            $expanded = $this->expand($object, $expand, $scenario);
-            foreach ($expanded as $name => $value) {
-                $result[$name] = $value;
-            }
-        }
-
-        return \count($result) ? $result : new \ArrayObject();
-    }
-
-    public function supportsNormalization($data, string $format = null): bool
-    {
-        if (\is_object($data)) {
-            $class = \get_class($data);
-
-            return null !== $this->entityConverterRegistry->getConverterForClass($class)
-                || null !== $this->metadataRegistry->getMetadataForClass($class);
-        }
-
-        return false;
-    }
-
-    public function expand(
-        object $object,
-        array $expand,
-        ScenarioInterface $scenario
-    ): array {
-        $result = $this->normalize($object, null, [
-            'scenario' => $scenario,
-            'expand' => $expand,
-        ]);
 
         $class = \get_class($object);
         $metaData = $this->metadataRegistry->getMetadataForClass($class);
