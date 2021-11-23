@@ -37,8 +37,6 @@ services:
   Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry: ~
   Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry: ~
 
-  Borodulin\Bundle\GridApiBundle\Serializer\RecursiveExpander: ~
-
   grid_api_bundle.entity_converter.entity_api:
     class: Borodulin\Bundle\GridApiBundle\GridApi\EntityApi
     arguments:
@@ -57,9 +55,6 @@ services:
       $name: 'default'
 
   Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface: '@grid_api_bundle.entity_converter.scenario'
-
-  Borodulin\Bundle\GridApiBundle\Serializer\DoctrineEntityNormalizer:
-    tags: [ serializer.normalizer ]
 
   Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer:
     tags: [ serializer.normalizer ]
