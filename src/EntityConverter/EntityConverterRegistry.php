@@ -14,14 +14,14 @@ class EntityConverterRegistry
     private ScenarioInterface $defaultScenario;
 
     /**
-     * @param EntityConverterInterface[]|CustomScenarioInterface[] $diConverters
+     * @param EntityConverterInterface[]|CustomScenarioInterface[] $converters
      */
     public function __construct(
         ScenarioInterface $defaultScenario,
-        array $diConverters = []
+        array $converters = []
     ) {
         $this->defaultScenario = $defaultScenario;
-        foreach ($diConverters as $class => $converter) {
+        foreach ($converters as $class => $converter) {
             $scenario = is_subclass_of($converter, CustomScenarioInterface::class) ?
                 $converter->getScenario() : $this->defaultScenario;
             $this->converters[$scenario->getName()][$class] = $converter;
