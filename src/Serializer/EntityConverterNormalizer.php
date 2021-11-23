@@ -14,7 +14,6 @@ class EntityConverterNormalizer implements NormalizerInterface
 {
     private EntityConverterRegistry $entityConverterRegistry;
     private ScenarioInterface $scenario;
-    private NormalizerInterface $normalizer;
     private PropertyAccessorInterface $propertyAccessor;
     private PropertyListExtractorInterface $propertyListExtractor;
     private RecursiveExpander $recursiveExpander;
@@ -24,12 +23,10 @@ class EntityConverterNormalizer implements NormalizerInterface
         PropertyAccessorInterface $propertyAccessor,
         PropertyListExtractorInterface $propertyListExtractor,
         ScenarioInterface $scenario,
-        NormalizerInterface $normalizer,
         RecursiveExpander $recursiveExpander
     ) {
         $this->entityConverterRegistry = $entityConverterRegistry;
         $this->scenario = $scenario;
-        $this->normalizer = $normalizer;
         $this->propertyAccessor = $propertyAccessor;
         $this->propertyListExtractor = $propertyListExtractor;
         $this->recursiveExpander = $recursiveExpander;
@@ -52,13 +49,9 @@ class EntityConverterNormalizer implements NormalizerInterface
         }
 
         if (\is_object($converted)) {
-            if ($this->normalizer->supportsNormalization($converted)) {
-                $data = $this->normalizer->normalize($converted, null, ['scenario' => $scenario]);
-            } else {
-                foreach ($this->propertyListExtractor->getProperties($converted) as $property) {
-                    if ($this->propertyAccessor->isReadable($converted, $property)) {
-                        $data[$property] = $this->propertyAccessor->getValue($converted, $property);
-                    }
+            foreach ($this->propertyListExtractor->getProperties($converted) as $property) {
+                if ($this->propertyAccessor->isReadable($converted, $property)) {
+                    $data[$property] = $this->propertyAccessor->getValue($converted, $property);
                 }
             }
         } elseif (\is_array($converted)) {
