@@ -46,7 +46,7 @@ class EntityConverterFactoryPass implements CompilerPassInterface
                         throw new \RuntimeException(sprintf('Invalid converter handler: type-hint of argument "$%s" in method "%s::__invoke()" must be a class , "%s" given.', $parameters[0]->getName(), $reflection->getName(), (string) $type));
                     }
 
-                    $converters[(string) $type] = new Reference((string) $type);
+                    $converters[(string) $type] = new Reference($reflection->getName());
                 }
             }
         }
