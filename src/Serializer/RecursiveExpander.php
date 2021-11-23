@@ -59,7 +59,7 @@ class RecursiveExpander
                 $expandTree[$key] = [];
             }
         }
-        $expand = array_filter($expand, fn ($item) => strpos($item, '*') > 0);
+        $expand = array_filter($expand, fn ($item) => false !== strpos($item, '*'));
         foreach ($expand as $expandItem) {
             $normalizedNames = array_map(
                 fn ($item) => $nameConverter->normalize($item),
