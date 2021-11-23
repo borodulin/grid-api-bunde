@@ -7,9 +7,8 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi\Sort;
 interface CustomSortInterface
 {
     /**
-     * Массив вида
      * ['sorting_query_string' => 'alias.field'].
-     * alias.field - DQL выражение.
+     * alias.field - DQL expression.
      *
      * @example ['customer_id' => 'customer.id']
      *

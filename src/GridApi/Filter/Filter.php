@@ -37,7 +37,11 @@ class Filter
             $name = $this->nameConverter->normalize($name);
             if (isset($filterMap[$name])) {
                 [$fieldName, $fieldType] = $filterMap[$name];
-                $this->addFilter($queryBuilder, $fieldName, $fieldType, $filterValue);
+                if (\is_callable($fieldName)) {
+                    \call_user_func($fieldName, $queryBuilder, $filterValue);
+                } else {
+                    $this->addFilter($queryBuilder, $fieldName, $fieldType, $filterValue);
+                }
             }
         }
 
@@ -58,7 +62,6 @@ class Filter
                 ->getCustomFilterFieldsForClass($metadata->getReflectionClass()->getName());
 
             if ($filterableFields) {
-                // TODO
                 foreach ($filterableFields->getFilterFields() as $filterName => $fieldName) {
                     $result[$filterName] = [$fieldName, null];
                 }
@@ -102,7 +105,7 @@ class Filter
             case Types::BIGINT:
             case Types::SMALLINT:
                 if (\is_array($filterValue)) {
-                    $queryBuilder->andWhere("$fieldName in (:$p)")->setParameter($p, $filterValue);
+                    $queryBuilder->andWhere("$fieldName IN (:$p)")->setParameter($p, $filterValue);
                 } else {
                     $queryBuilder->andWhere("$fieldName = :$p")->setParameter($p, $filterValue);
                 }
@@ -111,9 +114,9 @@ class Filter
             case Types::TEXT:
             case null:
                 if (\is_array($filterValue)) {
-                    $queryBuilder->andWhere("$fieldName in (:$p)")->setParameter($p, $filterValue);
+                    $queryBuilder->andWhere("$fieldName IN (:$p)")->setParameter($p, $filterValue);
                 } elseif (\is_string($filterValue) && preg_match('/^%(.+)%$/', $filterValue)) {
-                    $queryBuilder->andWhere("ilike($fieldName, :$p) = TRUE")->setParameter($p, $filterValue);
+                    $queryBuilder->andWhere("$fieldName LIKE :$p")->setParameter($p, $filterValue);
                 } else {
                     $queryBuilder->andWhere("$fieldName = :$p")->setParameter($p, $filterValue);
                 }
