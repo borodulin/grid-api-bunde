@@ -54,25 +54,29 @@ class Filter
 
         $iterator = new QueryBuilderEntityIterator($this->nameConverter);
 
-        foreach ($iterator->aliasIterate($queryBuilder) as $alias => $aliasItem) {
+        foreach ($iterator->aliasIterate($queryBuilder) as $aliasItem) {
             /** @var ClassMetadata $metadata */
-            $metadata = array_values($aliasItem)[0];
+            foreach ($aliasItem as $alias => $metadata) {
+                $filterableFields = $this->entityConverterRegistry
+                    ->getCustomFilterFieldsForClass($metadata->getReflectionClass()->getName());
 
-            $filterableFields = $this->entityConverterRegistry
-                ->getCustomFilterFieldsForClass($metadata->getReflectionClass()->getName());
-
-            if ($filterableFields) {
-                foreach ($filterableFields->getFilterFields() as $filterName => $fieldName) {
-                    $result[$filterName] = [$fieldName, null];
-                }
-            } else {
-                foreach ($iterator->fieldsIterate($alias, $aliasItem) as $filterName => $fieldName) {
-                    [, $realName] = explode('.', $fieldName);
-                    $filterName = str_replace('.', '_', $filterName);
-                    if ($metadata->isSingleValuedAssociation($realName)) {
-                        $result[$filterName] = [$fieldName, null];
-                    } else {
-                        $result[$filterName] = [$fieldName, $metadata->getTypeOfField($realName)];
+                if ($filterableFields) {
+                    foreach ($filterableFields->getFilterFields() as $filterName => $fieldName) {
+                        if (\is_int($filterName) && \is_string($fieldName)) {
+                            $result[$fieldName] = ["$alias.$fieldName", null];
+                        } elseif (\is_string($filterName)) {
+                            $result[$filterName] = [$fieldName, null];
+                        }
+                    }
+                } else {
+                    foreach ($iterator->fieldsIterate($alias, $aliasItem) as $filterName => $fieldName) {
+                        [, $realName] = explode('.', $fieldName);
+                        $filterName = str_replace('.', '_', $filterName);
+                        if ($metadata->isSingleValuedAssociation($realName)) {
+                            $result[$filterName] = [$fieldName, null];
+                        } else {
+                            $result[$filterName] = [$fieldName, $metadata->getTypeOfField($realName)];
+                        }
                     }
                 }
             }
