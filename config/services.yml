@@ -62,3 +62,5 @@ services:
 
   Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer:
     tags: [ serializer.normalizer ]
+    arguments:
+      $normalizer: '@serializer'
