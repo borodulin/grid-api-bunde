@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\Sort;
+namespace Borodulin\Bundle\GridApiBundle\GridApi\DataProvider;
 
 interface CustomSortInterface
 {

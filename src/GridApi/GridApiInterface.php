@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
 use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationRequestInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationResponseInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortRequestInterface;
-use Doctrine\ORM\QueryBuilder;
 
 interface GridApiInterface
 {
@@ -25,8 +25,8 @@ interface GridApiInterface
     public function setScenario(ScenarioInterface $scenario): self;
 
     public function paginate(
-        QueryBuilder $queryBuilder
+        DataProviderInterface $dataProvider
     ): PaginationResponseInterface;
 
-    public function listAll(QueryBuilder $queryBuilder): array;
+    public function listAll(DataProviderInterface $dataProvider): array;
 }

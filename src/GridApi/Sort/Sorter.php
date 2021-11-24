@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Borodulin\Bundle\GridApiBundle\GridApi\Sort;
 
 use Borodulin\Bundle\GridApiBundle\DoctrineInteraction\QueryBuilderEntityIterator;
-use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
+use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
 use Borodulin\Bundle\GridApiBundle\Serializer\LowerCaseNameConverter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -13,46 +13,44 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 class Sorter
 {
     private NameConverterInterface $nameConverter;
-    private EntityConverterRegistry $entityConverterRegistry;
 
     public function __construct(
-        EntityConverterRegistry $entityConverterRegistry
     ) {
-        $this->entityConverterRegistry = $entityConverterRegistry;
         $this->nameConverter = new LowerCaseNameConverter();
     }
 
-    public function sort(SortRequest $sortRequest, QueryBuilder $queryBuilder): QueryBuilder
-    {
-        $queryBuilder = clone $queryBuilder;
-        $queryBuilder->resetDQLPart('orderBy');
+    public function sort(
+        SortRequest $sortRequest,
+        QueryBuilder $queryBuilder,
+        ?CustomSortInterface $customSort
+    ): void {
+        $sortMap = $this->getSortMap($queryBuilder, $customSort);
 
-        $sortMap = $this->getSortMap($queryBuilder);
+        $orderByArray = [];
 
         foreach ($sortRequest->getSortOrders() as $name => $sortOrder) {
             $name = $this->nameConverter->normalize($name);
             if (isset($sortMap[$name])) {
-                $queryBuilder->addOrderBy($sortMap[$name], $sortOrder);
+                $orderByArray[$sortMap[$name]] = $sortOrder;
             }
         }
-
-        return $queryBuilder;
+        if (\count($orderByArray)) {
+            $queryBuilder->resetDQLPart('orderBy');
+            foreach ($orderByArray as $sort => $order) {
+                $queryBuilder->addOrderBy($sort, $order);
+            }
+        }
     }
 
-    private function getSortMap(QueryBuilder $queryBuilder): array
+    private function getSortMap(QueryBuilder $queryBuilder, ?CustomSortInterface $customSort): array
     {
         $result = [];
 
         $iterator = new QueryBuilderEntityIterator($this->nameConverter);
 
         foreach ($iterator->aliasIterate($queryBuilder) as $alias => $aliasItem) {
-            $metadata = array_values($aliasItem)[0];
-
-            $sortableFields = $this->entityConverterRegistry
-                ->getCustomSortFieldsForClass($metadata->getReflectionClass()->getName());
-
-            if ($sortableFields) {
-                foreach ($sortableFields->getSortFields() as $sortName => $fieldName) {
+            if (null !== $customSort) {
+                foreach ($customSort->getSortFields() as $sortName => $fieldName) {
                     $result[$sortName] = $fieldName;
                 }
             } else {

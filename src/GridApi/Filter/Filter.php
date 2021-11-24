@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Borodulin\Bundle\GridApiBundle\GridApi\Filter;
 
 use Borodulin\Bundle\GridApiBundle\DoctrineInteraction\QueryBuilderEntityIterator;
-use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
+use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
 use Borodulin\Bundle\GridApiBundle\Serializer\LowerCaseNameConverter;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -16,22 +16,18 @@ class Filter
 {
     private NameConverterInterface $nameConverter;
     private int $counter = 0;
-    private EntityConverterRegistry $entityConverterRegistry;
 
     public function __construct(
-        EntityConverterRegistry $entityConverterRegistry
     ) {
         $this->nameConverter = new LowerCaseNameConverter();
-        $this->entityConverterRegistry = $entityConverterRegistry;
     }
 
     public function filter(
         FilterRequestInterface $filterRequest,
-        QueryBuilder $queryBuilder
-    ): QueryBuilder {
-        $queryBuilder = clone $queryBuilder;
-
-        $filterMap = $this->getFilterMap($queryBuilder);
+        QueryBuilder $queryBuilder,
+        ?CustomFilterInterface $customFilter
+    ): void {
+        $filterMap = $this->getFilterMap($queryBuilder, $customFilter);
 
         foreach ($filterRequest->getFilters() as $name => $filterValue) {
             $name = $this->nameConverter->normalize($name);
@@ -44,11 +40,9 @@ class Filter
                 }
             }
         }
-
-        return $queryBuilder;
     }
 
-    private function getFilterMap(QueryBuilder $queryBuilder): array
+    private function getFilterMap(QueryBuilder $queryBuilder, ?CustomFilterInterface $customFilter): array
     {
         $result = [];
 
@@ -57,11 +51,8 @@ class Filter
         foreach ($iterator->aliasIterate($queryBuilder) as $aliasItem) {
             /** @var ClassMetadata $metadata */
             foreach ($aliasItem as $alias => $metadata) {
-                $filterableFields = $this->entityConverterRegistry
-                    ->getCustomFilterFieldsForClass($metadata->getReflectionClass()->getName());
-
-                if ($filterableFields) {
-                    foreach ($filterableFields->getFilterFields() as $filterName => $fieldName) {
+                if (null !== $customFilter) {
+                    foreach ($customFilter->getFilterFields() as $filterName => $fieldName) {
                         if (\is_int($filterName) && \is_string($fieldName)) {
                             $result[$fieldName] = ["$alias.$fieldName", null];
                         } elseif (\is_string($filterName)) {

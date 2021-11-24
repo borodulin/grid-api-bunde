@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
-use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\Filter;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestInterface;
@@ -27,17 +29,14 @@ class GridApi implements GridApiInterface
     private ?PaginationRequestInterface $paginationRequest = null;
 
     private int $defaultPageSize;
-    private EntityConverterRegistry $entityConverterRegistry;
 
     public function __construct(
-        EntityConverterRegistry $entityConverterRegistry,
         ScenarioInterface $scenario,
         NormalizerInterface $normalizer,
         int $defaultPageSize
     ) {
         $this->defaultPageSize = $defaultPageSize;
         $this->entityApi = new EntityApi($normalizer, $scenario);
-        $this->entityConverterRegistry = $entityConverterRegistry;
     }
 
     public function setFilterRequest(?FilterRequestInterface $filterRequest): GridApiInterface
@@ -75,28 +74,34 @@ class GridApi implements GridApiInterface
         return $this;
     }
 
-    private function prepareQuery(QueryBuilder $queryBuilder): QueryBuilder
+    private function prepareQueryBuilder(DataProviderInterface $dataProvider): QueryBuilder
     {
-        $qbClone = clone $queryBuilder;
+        $qbClone = clone $dataProvider->getQueryBuilder();
 
         if (null !== $this->sortRequest) {
-            $qbClone = (new Sorter($this->entityConverterRegistry))
-                ->sort($this->sortRequest, $qbClone);
+            (new Sorter())->sort(
+                $this->sortRequest,
+                $qbClone,
+                $dataProvider instanceof CustomSortInterface ? $dataProvider : null
+            );
         }
         if (null !== $this->filterRequest) {
-            $qbClone = (new Filter($this->entityConverterRegistry))
-                ->filter($this->filterRequest, $qbClone);
+            (new Filter())->filter(
+                $this->filterRequest,
+                $qbClone,
+                $dataProvider instanceof CustomFilterInterface ? $dataProvider : null
+            );
         }
 
         return $qbClone;
     }
 
     public function paginate(
-        QueryBuilder $queryBuilder
+        DataProviderInterface $dataProvider
     ): PaginationResponseInterface {
         $paginationRequest = $this->paginationRequest ?? new PaginationRequest(0, $this->defaultPageSize);
 
-        $queryBuilder = $this->prepareQuery($queryBuilder);
+        $queryBuilder = $this->prepareQueryBuilder($dataProvider);
 
         return (new Paginator())
             ->paginate(
@@ -106,9 +111,9 @@ class GridApi implements GridApiInterface
             );
     }
 
-    public function listAll(QueryBuilder $queryBuilder): array
+    public function listAll(DataProviderInterface $dataProvider): array
     {
-        $queryBuilder = $this->prepareQuery($queryBuilder);
+        $queryBuilder = $this->prepareQueryBuilder($dataProvider);
 
         return array_map(
             [$this->entityApi, 'show'],
