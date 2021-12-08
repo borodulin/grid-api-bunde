@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\DoctrineInteraction;
 
+use Borodulin\Bundle\GridApiBundle\Serializer\LowerCaseNameConverter;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Expr\Join;
@@ -15,9 +16,8 @@ class QueryBuilderEntityIterator
     private NameConverterInterface $nameConverter;
 
     public function __construct(
-        NameConverterInterface $nameConverter
     ) {
-        $this->nameConverter = $nameConverter;
+        $this->nameConverter = new LowerCaseNameConverter();
     }
 
     public function aliasIterate(QueryBuilder $queryBuilder): iterable

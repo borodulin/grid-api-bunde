@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
 
-use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestFactory;
@@ -19,7 +18,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class GridApiResolver implements ArgumentValueResolverInterface
 {
-    private EntityConverterRegistry $entityConverterRegistry;
     private string $expandKey;
     private string $pageKey;
     private string $pageSizeKey;
@@ -29,7 +27,6 @@ class GridApiResolver implements ArgumentValueResolverInterface
     private NormalizerInterface $normalizer;
 
     public function __construct(
-        EntityConverterRegistry $entityConverterRegistry,
         ScenarioInterface $scenario,
         NormalizerInterface $normalizer,
         string $expandKey,
@@ -38,7 +35,6 @@ class GridApiResolver implements ArgumentValueResolverInterface
         string $sortKey,
         int $defaultPageSize
     ) {
-        $this->entityConverterRegistry = $entityConverterRegistry;
         $this->scenario = $scenario;
         $this->expandKey = $expandKey;
         $this->pageKey = $pageKey;
@@ -83,7 +79,6 @@ class GridApiResolver implements ArgumentValueResolverInterface
         ]);
 
         yield (new GridApi(
-            $this->entityConverterRegistry,
             $this->scenario,
             $this->normalizer,
             $this->defaultPageSize

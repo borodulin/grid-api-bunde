@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi\Pagination;
 
-use Doctrine\ORM\QueryBuilder;
+use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\PaginationQueryBuilderInterface;
 
 class Paginator
 {
     public function paginate(
         PaginationRequestInterface $paginationRequest,
-        QueryBuilder $queryBuilder,
+        PaginationQueryBuilderInterface $paginationQueryBuilder,
         callable $converter = null
     ): PaginationResponseInterface {
         $pageSize = $paginationRequest->getPageSize();
@@ -18,21 +18,15 @@ class Paginator
         $offset = $page * $pageSize;
         $limit = $pageSize;
 
-        $qbResults = (clone $queryBuilder)
-            ->setMaxResults($limit)
-            ->setFirstResult($offset);
+        $paginationQueryBuilder->setLimit($limit);
+        $paginationQueryBuilder->setOffset($offset);
 
-        $items = $qbResults->getQuery()->getResult();
+        $items = $paginationQueryBuilder->fetchAll();
 
         if (null !== $converter) {
             $items = array_map($converter, $items);
         }
-
-        $qbCount = (clone $queryBuilder)
-            ->resetDQLPart('orderBy')
-        ;
-        $alias = $qbCount->getRootAliases()[0];
-        $totalCount = (int) $qbCount->select("count($alias)")->getQuery()->getSingleScalarResult();
+        $totalCount = $paginationQueryBuilder->queryCount();
 
         $pageCount = (int) ceil($totalCount / $pageSize);
 

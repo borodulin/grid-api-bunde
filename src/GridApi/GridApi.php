@@ -8,6 +8,7 @@ use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\QueryBuilderInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\Filter;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestInterface;
@@ -17,7 +18,6 @@ use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationResponseInterfac
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\Paginator;
 use Borodulin\Bundle\GridApiBundle\GridApi\Sort\Sorter;
 use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortRequestInterface;
-use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class GridApi implements GridApiInterface
@@ -74,26 +74,25 @@ class GridApi implements GridApiInterface
         return $this;
     }
 
-    private function prepareQueryBuilder(DataProviderInterface $dataProvider): QueryBuilder
+    private function prepareQueryBuilder(DataProviderInterface $dataProvider): QueryBuilderInterface
     {
-        $qbClone = clone $dataProvider->getQueryBuilder();
-
+        $queryBuilder = $dataProvider->getQueryBuilder();
         if (null !== $this->sortRequest) {
             (new Sorter())->sort(
                 $this->sortRequest,
-                $qbClone,
+                $queryBuilder,
                 $dataProvider instanceof CustomSortInterface ? $dataProvider : null
             );
         }
         if (null !== $this->filterRequest) {
             (new Filter())->filter(
                 $this->filterRequest,
-                $qbClone,
+                $queryBuilder,
                 $dataProvider instanceof CustomFilterInterface ? $dataProvider : null
             );
         }
 
-        return $qbClone;
+        return $queryBuilder;
     }
 
     public function paginate(
@@ -117,7 +116,7 @@ class GridApi implements GridApiInterface
 
         return array_map(
             [$this->entityApi, 'show'],
-            $queryBuilder->getQuery()->getResult()
+            $queryBuilder->fetchAll()
         );
     }
 }
