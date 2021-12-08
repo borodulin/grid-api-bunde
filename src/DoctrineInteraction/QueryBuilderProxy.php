@@ -34,7 +34,10 @@ class QueryBuilderProxy implements QueryBuilderInterface
     public function queryCount(): int
     {
         $qbCount = (clone $this->queryBuilder)
-            ->resetDQLPart('orderBy');
+            ->resetDQLPart('orderBy')
+            ->setFirstResult(null)
+            ->setMaxResults(null)
+        ;
         $alias = $qbCount->getRootAliases()[0];
 
         return (int) $qbCount->select("count($alias)")->getQuery()->getSingleScalarResult();
