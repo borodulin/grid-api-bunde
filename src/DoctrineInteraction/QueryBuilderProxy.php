@@ -149,4 +149,9 @@ class QueryBuilderProxy implements QueryBuilderInterface
     {
         $this->queryBuilder->resetDQLPart('orderBy');
     }
+
+    public function getQueryBuilder(): QueryBuilder
+    {
+        return $this->queryBuilder;
+    }
 }
