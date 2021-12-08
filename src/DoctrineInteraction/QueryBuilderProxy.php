@@ -53,14 +53,10 @@ class QueryBuilderProxy implements QueryBuilderInterface
         $result = [];
 
         $iterator = new QueryBuilderEntityIterator();
-        $rootAliases = $this->queryBuilder->getRootAliases();
 
         foreach ($iterator->aliasIterate($this->queryBuilder) as $aliasItem) {
             /** @var ClassMetadata $metadata */
             foreach ($aliasItem as $alias => $metadata) {
-                if (\in_array($alias, $rootAliases)) {
-                    $alias = '';
-                }
                 foreach ($iterator->fieldsIterate($alias, $aliasItem) as $filterName => $fieldName) {
                     [, $realName] = explode('.', $fieldName);
                     $filterName = str_replace('.', '_', $filterName);
@@ -126,12 +122,8 @@ class QueryBuilderProxy implements QueryBuilderInterface
         $result = [];
 
         $iterator = new QueryBuilderEntityIterator();
-        $rootAliases = $this->queryBuilder->getRootAliases();
 
         foreach ($iterator->aliasIterate($this->queryBuilder) as $alias => $aliasItem) {
-            if (\in_array($alias, $rootAliases)) {
-                $alias = '';
-            }
             foreach ($iterator->fieldsIterate($alias, $aliasItem) as $sortName => $fieldName) {
                 $result[$sortName] = $fieldName;
             }
