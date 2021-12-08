@@ -34,6 +34,9 @@ class EntityConverterNormalizer implements NormalizerInterface
         $this->metadataRegistry = $metadataRegistry;
     }
 
+    /**
+     * @return array|\ArrayObject
+     */
     public function normalize($object, string $format = null, array $context = [])
     {
         $result = $this->expand(
