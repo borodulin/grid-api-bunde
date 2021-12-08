@@ -135,12 +135,12 @@ class QueryBuilderProxy implements QueryBuilderInterface
 
         $iterator = new QueryBuilderEntityIterator();
 
-        foreach ($iterator->aliasIterate($this->queryBuilder) as $alias => $aliasItem) {
-            if (null !== $customSort) {
-                foreach ($customSort->getSortFields() as $sortName => $fieldName) {
-                    $result[$sortName] = $fieldName;
-                }
-            } else {
+        if (null !== $customSort) {
+            foreach ($customSort->getSortFields() as $sortName => $fieldName) {
+                $result[$sortName] = $fieldName;
+            }
+        } else {
+            foreach ($iterator->aliasIterate($this->queryBuilder) as $alias => $aliasItem) {
                 foreach ($iterator->fieldsIterate($alias, $aliasItem) as $sortName => $fieldName) {
                     $result[$sortName] = $fieldName;
                 }
