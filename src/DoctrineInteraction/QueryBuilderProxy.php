@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\DoctrineInteraction;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\QueryBuilderInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -50,36 +48,26 @@ class QueryBuilderProxy implements QueryBuilderInterface
             ->getResult();
     }
 
-    public function getFilterMap(?CustomFilterInterface $customFilter): array
+    public function getFilterMap(): array
     {
         $result = [];
 
         $iterator = new QueryBuilderEntityIterator();
         $rootAliases = $this->queryBuilder->getRootAliases();
 
-        if (null !== $customFilter) {
-            foreach ($customFilter->getFilterFields() as $filterName => $fieldName) {
-                if (\is_int($filterName) && \is_string($fieldName)) {
-                    $result[$fieldName] = ["$fieldName", null];
-                } elseif (\is_string($filterName)) {
-                    $result[$filterName] = [$fieldName, null];
+        foreach ($iterator->aliasIterate($this->queryBuilder) as $aliasItem) {
+            /** @var ClassMetadata $metadata */
+            foreach ($aliasItem as $alias => $metadata) {
+                if (\in_array($alias, $rootAliases)) {
+                    $alias = '';
                 }
-            }
-        } else {
-            foreach ($iterator->aliasIterate($this->queryBuilder) as $aliasItem) {
-                /** @var ClassMetadata $metadata */
-                foreach ($aliasItem as $alias => $metadata) {
-                    if (\in_array($alias, $rootAliases)) {
-                        $alias = '';
-                    }
-                    foreach ($iterator->fieldsIterate($alias, $aliasItem) as $filterName => $fieldName) {
-                        [, $realName] = explode('.', $fieldName);
-                        $filterName = str_replace('.', '_', $filterName);
-                        if ($metadata->isSingleValuedAssociation($realName)) {
-                            $result[$filterName] = [$fieldName, null];
-                        } else {
-                            $result[$filterName] = [$fieldName, $metadata->getTypeOfField($realName)];
-                        }
+                foreach ($iterator->fieldsIterate($alias, $aliasItem) as $filterName => $fieldName) {
+                    [, $realName] = explode('.', $fieldName);
+                    $filterName = str_replace('.', '_', $filterName);
+                    if ($metadata->isSingleValuedAssociation($realName)) {
+                        $result[$filterName] = [$fieldName, null];
+                    } else {
+                        $result[$filterName] = [$fieldName, $metadata->getTypeOfField($realName)];
                     }
                 }
             }
@@ -133,26 +121,19 @@ class QueryBuilderProxy implements QueryBuilderInterface
         }
     }
 
-    public function getSortMap(?CustomSortInterface $customSort): array
+    public function getSortMap(): array
     {
         $result = [];
 
         $iterator = new QueryBuilderEntityIterator();
+        $rootAliases = $this->queryBuilder->getRootAliases();
 
-        if (null !== $customSort) {
-            foreach ($customSort->getSortFields() as $sortName => $fieldName) {
-                $result[$sortName] = $fieldName;
+        foreach ($iterator->aliasIterate($this->queryBuilder) as $alias => $aliasItem) {
+            if (\in_array($alias, $rootAliases)) {
+                $alias = '';
             }
-        } else {
-            $rootAliases = $this->queryBuilder->getRootAliases();
-
-            foreach ($iterator->aliasIterate($this->queryBuilder) as $alias => $aliasItem) {
-                if (\in_array($alias, $rootAliases)) {
-                    $alias = '';
-                }
-                foreach ($iterator->fieldsIterate($alias, $aliasItem) as $sortName => $fieldName) {
-                    $result[$sortName] = $fieldName;
-                }
+            foreach ($iterator->fieldsIterate($alias, $aliasItem) as $sortName => $fieldName) {
+                $result[$sortName] = $fieldName;
             }
         }
 

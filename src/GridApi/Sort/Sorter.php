@@ -10,11 +10,11 @@ use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\SortQueryBuilderInterfac
 class Sorter
 {
     public function sort(
-        SortRequest $sortRequest,
+        SortRequestInterface $sortRequest,
         SortQueryBuilderInterface $sortQueryBuilder,
         ?CustomSortInterface $customSort
     ): void {
-        $sortMap = $sortQueryBuilder->getSortMap($customSort);
+        $sortMap = (null !== $customSort) ? $customSort->getSortFields() : $sortQueryBuilder->getSortMap();
 
         $orderByArray = [];
 

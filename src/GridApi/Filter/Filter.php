@@ -14,7 +14,18 @@ class Filter
         FilterQueryBuilderInterface $filterQueryBuilder,
         ?CustomFilterInterface $customFilter
     ): void {
-        $filterMap = $filterQueryBuilder->getFilterMap($customFilter);
+        if (null !== $customFilter) {
+            $filterMap = [];
+            foreach ($customFilter->getFilterFields() as $filterName => $fieldName) {
+                if (\is_int($filterName) && \is_string($fieldName)) {
+                    $filterMap[$fieldName] = ["$fieldName", null];
+                } elseif (\is_string($filterName)) {
+                    $filterMap[$filterName] = [$fieldName, null];
+                }
+            }
+        } else {
+            $filterMap = $filterQueryBuilder->getFilterMap();
+        }
 
         foreach ($filterRequest->getFilters() as $name => $filterValue) {
             if (isset($filterMap[$name])) {

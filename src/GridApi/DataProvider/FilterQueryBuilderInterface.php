@@ -6,7 +6,7 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi\DataProvider;
 
 interface FilterQueryBuilderInterface
 {
-    public function getFilterMap(?CustomFilterInterface $customFilter): array;
+    public function getFilterMap(): array;
 
     public function addFilter(string $fieldName, ?string $fieldType, $filterValue): void;
 }
