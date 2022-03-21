@@ -17,6 +17,10 @@ services:
   _defaults:
     autowire: true
 
+  _instanceof:
+    Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterInterface:
+      tags: ['grid_api.entity_converter']
+
   Borodulin\Bundle\GridApiBundle\ArgumentResolver\EntityApiResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
@@ -58,3 +62,8 @@ services:
 
   Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer:
     tags: [ serializer.normalizer ]
+
+  Borodulin\Bundle\GridApiBundle\Serializer\QueryBuilderNormalizer:
+    tags: [ serializer.normalizer ]
+    arguments:
+      $normalizer: '@serializer'
