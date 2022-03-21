@@ -66,4 +66,4 @@ services:
   Borodulin\Bundle\GridApiBundle\Serializer\QueryBuilderNormalizer:
     tags: [ serializer.normalizer ]
     arguments:
-      $normalizer: '@serializer'
+      $normalizer: '@serializer.normalizer.object'
