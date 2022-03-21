@@ -51,7 +51,7 @@ services:
   grid_api_bundle.entity_converter.grid_api:
     class: Borodulin\Bundle\GridApiBundle\GridApi\GridApi
     arguments:
-      $normalizer: '@serializer'
+      $normalizer: '@grid_api_bundle.entity_converter_normalizer'
       $defaultPageSize: '%grid_api.default_page_size%'
 
   Borodulin\Bundle\GridApiBundle\GridApi\GridApiInterface: '@grid_api_bundle.entity_converter.grid_api'
@@ -63,10 +63,11 @@ services:
 
   Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface: '@grid_api_bundle.entity_converter.scenario'
 
-  Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer:
+  grid_api_bundle.entity_converter_normalizer:
+    class: Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer
     tags: [ serializer.normalizer ]
 
   Borodulin\Bundle\GridApiBundle\Serializer\QueryBuilderNormalizer:
     tags: [ serializer.normalizer ]
     arguments:
-      $normalizer: '@serializer'
+      $normalizer: '@grid_api_bundle.entity_converter_normalizer'
