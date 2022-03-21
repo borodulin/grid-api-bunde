@@ -50,6 +50,8 @@ services:
 
   grid_api_bundle.entity_converter.grid_api:
     class: Borodulin\Bundle\GridApiBundle\GridApi\GridApi
+    arguments:
+      $defaultPageSize: '%grid_api.default_page_size%'
 
   Borodulin\Bundle\GridApiBundle\GridApi\GridApiInterface: '@grid_api_bundle.entity_converter.grid_api'
 
