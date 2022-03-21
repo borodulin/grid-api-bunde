@@ -11,7 +11,7 @@ parameters:
   grid_api.sort_key: '%env(GRID_API_SORT_KEY)%'
   grid_api.page_key: '%env(GRID_API_PAGE_KEY)%'
   grid_api.page_size_key: '%env(GRID_API_PAGE_SIZE_KEY)%'
-  grid_api.default_page_size: '%env(GRID_API_DEFAULT_PAGE_SIZE)%'
+  grid_api.default_page_size: '%env(int:GRID_API_DEFAULT_PAGE_SIZE)%'
 
 services:
   _defaults:
