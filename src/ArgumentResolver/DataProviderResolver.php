@@ -51,7 +51,7 @@ class DataProviderResolver implements ArgumentValueResolverInterface
 
         $reflection = new \ReflectionClass($type);
 
-        return $this->serviceValueResolver->supports($request, $argument)
+        return $this->serviceSupports($request, $argument)
             && $reflection->implementsInterface(DataProviderInterface::class);
     }
 
@@ -94,5 +94,26 @@ class DataProviderResolver implements ArgumentValueResolverInterface
         }
 
         return $this->container->get($controller)->get($argument->getName());
+    }
+
+    private function serviceSupports(Request $request, ArgumentMetadata $argument): bool
+    {
+        $controller = $request->attributes->get('_controller');
+
+        if (\is_array($controller) && \is_callable($controller, true) && \is_string($controller[0])) {
+            $controller = $controller[0] . '::' . $controller[1];
+        } elseif (!\is_string($controller) || '' === $controller) {
+            return false;
+        }
+
+        if ('\\' === $controller[0]) {
+            $controller = ltrim($controller, '\\');
+        }
+
+        if (!$this->container->has($controller) && false !== $i = strrpos($controller, ':')) {
+            $controller = substr($controller, 0, $i) . strtolower(substr($controller, $i));
+        }
+
+        return $this->container->has($controller) && $this->container->get($controller)->has($argument->getName());
     }
 }
