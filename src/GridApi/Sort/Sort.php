@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi\Sort;
 
-class SortRequest implements SortRequestInterface
+class Sort implements SortInterface
 {
     private array $sortOrders;
 

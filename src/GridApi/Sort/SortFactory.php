@@ -6,22 +6,30 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi\Sort;
 
 use Symfony\Component\HttpFoundation\InputBag;
 
-class SortRequestFactory
+class SortFactory
 {
-    public static function tryCreateFromInputBug(InputBag $inputBag, string $sortKey): ?SortRequest
+    private string $sortKey;
+
+    public function __construct(
+        string $sortKey
+    ) {
+        $this->sortKey = $sortKey;
+    }
+
+    public function tryCreateFromInputBug(InputBag $inputBag): ?Sort
     {
-        $sortQuery = $inputBag->get($sortKey);
+        $sortQuery = $inputBag->get($this->sortKey);
         if ($sortQuery) {
-            $sortOrders = self::getSortOrders((string) $sortQuery);
+            $sortOrders = $this->getSortOrders((string) $sortQuery);
             if ($sortOrders) {
-                return new SortRequest($sortOrders);
+                return new Sort($sortOrders);
             }
         }
 
         return null;
     }
 
-    private static function getSortOrders(string $sortQuery): array
+    private function getSortOrders(string $sortQuery): array
     {
         $sortOrders = array_filter(array_map('trim', explode(',', $sortQuery)));
         $result = [];

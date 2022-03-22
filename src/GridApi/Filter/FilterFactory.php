@@ -6,19 +6,26 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi\Filter;
 
 use Symfony\Component\HttpFoundation\InputBag;
 
-class FilterRequestFactory
+class FilterFactory
 {
-    public static function tryCreateFromInputBug(InputBag $inputBag, array $ignored): ?FilterRequest
+    private array $ignored;
+
+    public function __construct(array $ignored)
     {
-        $filters = self::getFilterQueryParams($inputBag, $ignored);
+        $this->ignored = $ignored;
+    }
+
+    public function tryCreateFromInputBug(InputBag $inputBag): ?Filter
+    {
+        $filters = $this->getFilterQueryParams($inputBag, $this->ignored);
         if ($filters) {
-            return new FilterRequest($filters);
+            return new Filter($filters);
         }
 
         return null;
     }
 
-    private static function getFilterQueryParams(InputBag $inputBag, array $ignored): array
+    private function getFilterQueryParams(InputBag $inputBag, array $ignored): array
     {
         $result = [];
         foreach ($inputBag->all() as $key => $value) {

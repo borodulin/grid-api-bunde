@@ -9,7 +9,7 @@ use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\PaginationQueryBuilderIn
 class Paginator
 {
     public function paginate(
-        PaginationRequestInterface $paginationRequest,
+        PaginationInterface $paginationRequest,
         PaginationQueryBuilderInterface $paginationQueryBuilder,
         callable $converter = null
     ): PaginationResponseInterface {

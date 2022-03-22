@@ -4,38 +4,18 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi\Filter;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\FilterQueryBuilderInterface;
-
-class Filter
+class Filter implements FilterInterface
 {
-    public function filter(
-        FilterRequestInterface $filterRequest,
-        FilterQueryBuilderInterface $filterQueryBuilder,
-        ?CustomFilterInterface $customFilter
-    ): void {
-        if (null !== $customFilter) {
-            $filterMap = [];
-            foreach ($customFilter->getFilterFields() as $filterName => $fieldName) {
-                if (\is_int($filterName) && \is_string($fieldName)) {
-                    $filterMap[$fieldName] = ["$fieldName", null];
-                } elseif (\is_string($filterName)) {
-                    $filterMap[$filterName] = [$fieldName, null];
-                }
-            }
-        } else {
-            $filterMap = $filterQueryBuilder->getFilterMap();
-        }
+    private array $filters;
 
-        foreach ($filterRequest->getFilters() as $name => $filterValue) {
-            if (isset($filterMap[$name])) {
-                [$fieldName, $fieldType] = $filterMap[$name];
-                if (\is_callable($fieldName)) {
-                    \call_user_func($fieldName, $filterQueryBuilder, $filterValue);
-                } else {
-                    $filterQueryBuilder->addFilter($fieldName, $fieldType, $filterValue);
-                }
-            }
-        }
+    public function __construct(
+        array $filters
+    ) {
+        $this->filters = $filters;
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
     }
 }

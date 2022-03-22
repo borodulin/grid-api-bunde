@@ -9,67 +9,68 @@ use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\QueryBuilderInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Filter\Filter;
-use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationRequest;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationRequestInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterBuilder;
+use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationFactory;
+use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationResponseInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\Paginator;
-use Borodulin\Bundle\GridApiBundle\GridApi\Sort\Sorter;
-use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortRequestInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortBuilder;
+use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class GridApi implements GridApiInterface
 {
-    private EntityApiInterface $entityApi;
-
-    private ?FilterRequestInterface $filterRequest = null;
-    private ?SortRequestInterface $sortRequest = null;
-    private ?PaginationRequestInterface $paginationRequest = null;
-
-    private int $defaultPageSize;
+    private ?FilterInterface $filterRequest = null;
+    private ?SortInterface $sort = null;
+    private ?PaginationInterface $pagination = null;
+    private ?ExpandInterface $expand = null;
+    private PaginationFactory $paginationRequestFactory;
+    private ScenarioInterface $scenario;
+    private NormalizerInterface $normalizer;
 
     public function __construct(
         ScenarioInterface $scenario,
         NormalizerInterface $normalizer,
-        int $defaultPageSize
+        PaginationFactory $paginationRequestFactory
     ) {
-        $this->defaultPageSize = $defaultPageSize;
-        $this->entityApi = new EntityApi($normalizer, $scenario);
+        $this->paginationRequestFactory = $paginationRequestFactory;
+        $this->scenario = $scenario;
+        $this->normalizer = $normalizer;
     }
 
-    public function setFilterRequest(?FilterRequestInterface $filterRequest): GridApiInterface
+    public function setFilter(?FilterInterface $filterRequest): GridApiInterface
     {
         $this->filterRequest = $filterRequest;
 
         return $this;
     }
 
-    public function setPaginationRequest(PaginationRequestInterface $paginationRequest): GridApiInterface
+    public function setPagination(PaginationInterface $pagination): GridApiInterface
     {
-        $this->paginationRequest = $paginationRequest;
+        $this->pagination = $pagination;
 
         return $this;
     }
 
-    public function setSortRequest(?SortRequestInterface $sortRequest): GridApiInterface
+    public function setSort(?SortInterface $sort): GridApiInterface
     {
-        $this->sortRequest = $sortRequest;
+        $this->sort = $sort;
 
         return $this;
     }
 
-    public function setExpandRequest(?ExpandRequestInterface $expandRequest): GridApiInterface
+    public function setExpand(?ExpandInterface $expand): GridApiInterface
     {
-        $this->entityApi->setExpandRequest($expandRequest);
+        $this->expand = $expand;
 
         return $this;
     }
 
-    public function setScenario(?ScenarioInterface $scenario): GridApiInterface
+    public function setScenario(ScenarioInterface $scenario): GridApiInterface
     {
-        $this->entityApi->setScenario($scenario);
+        $this->scenario = $scenario;
 
         return $this;
     }
@@ -77,15 +78,15 @@ class GridApi implements GridApiInterface
     private function prepareQueryBuilder(DataProviderInterface $dataProvider): QueryBuilderInterface
     {
         $queryBuilder = $dataProvider->getQueryBuilder();
-        if (null !== $this->sortRequest) {
-            (new Sorter())->sort(
-                $this->sortRequest,
+        if (null !== $this->sort) {
+            (new SortBuilder())->sort(
+                $this->sort,
                 $queryBuilder,
                 $dataProvider instanceof CustomSortInterface ? $dataProvider : null
             );
         }
         if (null !== $this->filterRequest) {
-            (new Filter())->filter(
+            (new FilterBuilder())->filter(
                 $this->filterRequest,
                 $queryBuilder,
                 $dataProvider instanceof CustomFilterInterface ? $dataProvider : null
@@ -98,15 +99,18 @@ class GridApi implements GridApiInterface
     public function paginate(
         DataProviderInterface $dataProvider
     ): PaginationResponseInterface {
-        $paginationRequest = $this->paginationRequest ?? new PaginationRequest(0, $this->defaultPageSize);
+        $pagination = $this->pagination ?? $this->paginationRequestFactory->createDefault();
 
         $queryBuilder = $this->prepareQueryBuilder($dataProvider);
 
         return (new Paginator())
             ->paginate(
-                $paginationRequest,
+                $pagination,
                 $queryBuilder,
-                [$this->entityApi, 'show']
+                fn ($entity) => $this->normalizer->normalize($entity, null, [
+                    'expand' => null !== $this->expand ? $this->expand->getExpand() : [],
+                    'scenario' => $this->scenario,
+                ])
             );
     }
 
@@ -115,7 +119,10 @@ class GridApi implements GridApiInterface
         $queryBuilder = $this->prepareQueryBuilder($dataProvider);
 
         return array_map(
-            [$this->entityApi, 'show'],
+            fn ($entity) => $this->normalizer->normalize($entity, null, [
+                'expand' => null !== $this->expand ? $this->expand->getExpand() : [],
+                'scenario' => $this->scenario,
+            ]),
             $queryBuilder->fetchAll()
         );
     }

@@ -7,10 +7,10 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi\Sort;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\SortQueryBuilderInterface;
 
-class Sorter
+class SortBuilder
 {
     public function sort(
-        SortRequestInterface $sortRequest,
+        SortInterface $sortRequest,
         SortQueryBuilderInterface $sortQueryBuilder,
         ?CustomSortInterface $customSort
     ): void {

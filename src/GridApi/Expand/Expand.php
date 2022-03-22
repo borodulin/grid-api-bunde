@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi\Expand;
 
-class ExpandRequest implements ExpandRequestInterface
+class Expand implements ExpandInterface
 {
     private array $expand;
 

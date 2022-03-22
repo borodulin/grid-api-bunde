@@ -31,12 +31,28 @@ services:
   Borodulin\Bundle\GridApiBundle\ArgumentResolver\GridApiResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
+
+  Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory:
     arguments:
       $expandKey: '%grid_api.expand_key%'
+
+  Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortFactory:
+    arguments:
+      $sortKey: '%grid_api.sort_key%'
+
+  Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationFactory:
+    arguments:
       $pageKey: '%grid_api.page_key%'
       $pageSizeKey: '%grid_api.page_size_key%'
-      $sortKey: '%grid_api.sort_key%'
       $defaultPageSize: '%grid_api.default_page_size%'
+
+  Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterFactory:
+    arguments:
+      $ignored:
+        - '%grid_api.sort_key%'
+        - '%grid_api.expand_key%'
+        - '%grid_api.page_key%'
+        - '%grid_api.page_size_key%'
 
   Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry: ~
   Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry: ~
@@ -67,7 +83,8 @@ services:
     class: Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer
     tags: [ serializer.normalizer ]
 
-  Borodulin\Bundle\GridApiBundle\Serializer\QueryBuilderNormalizer:
+  grid_api_bundle.entity_data_provider_normalizer:
+    class: Borodulin\Bundle\GridApiBundle\Serializer\DataProviderNormalizer
     tags: [ serializer.normalizer ]
     arguments:
       $normalizer: '@grid_api_bundle.entity_converter_normalizer'

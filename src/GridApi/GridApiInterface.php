@@ -6,21 +6,21 @@ namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
 use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandRequestInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterRequestInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationRequestInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationResponseInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortRequestInterface;
+use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortInterface;
 
 interface GridApiInterface
 {
-    public function setFilterRequest(?FilterRequestInterface $filterRequest): self;
+    public function setFilter(?FilterInterface $filterRequest): self;
 
-    public function setSortRequest(?SortRequestInterface $sortRequest): self;
+    public function setSort(?SortInterface $sort): self;
 
-    public function setPaginationRequest(PaginationRequestInterface $paginationRequest): self;
+    public function setPagination(PaginationInterface $pagination): self;
 
-    public function setExpandRequest(?ExpandRequestInterface $expandRequest): self;
+    public function setExpand(?ExpandInterface $expand): self;
 
     public function setScenario(ScenarioInterface $scenario): self;
 

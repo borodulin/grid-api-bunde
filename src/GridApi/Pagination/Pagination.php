@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi\Pagination;
 
-class PaginationRequest implements PaginationRequestInterface
+class Pagination implements PaginationInterface
 {
     private int $page;
     private int $pageSize;
