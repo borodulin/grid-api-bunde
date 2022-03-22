@@ -25,7 +25,6 @@ services:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
     arguments:
-      $expandKey: '%grid_api.expand_key%'
       $normalizer: '@serializer'
 
   Borodulin\Bundle\GridApiBundle\ArgumentResolver\GridApiResolver:
