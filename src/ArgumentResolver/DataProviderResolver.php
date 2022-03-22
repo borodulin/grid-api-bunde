@@ -45,13 +45,13 @@ class DataProviderResolver implements ArgumentValueResolverInterface
     {
         $type = $argument->getType();
 
-        if (!$type || !interface_exists($type)) {
+        if (!$type || !class_exists($type)) {
             return false;
         }
 
         $reflection = new \ReflectionClass($type);
 
-        return $reflection->isInterface()
+        return $reflection->isInstantiable()
             && $reflection->implementsInterface(DataProviderInterface::class);
     }
 
