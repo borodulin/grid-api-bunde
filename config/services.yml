@@ -31,6 +31,10 @@ services:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
 
+  Borodulin\Bundle\GridApiBundle\ArgumentResolver\DataProviderResolver:
+    tags:
+      - { name: controller.argument_value_resolver, priority: 50 }
+
   Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory:
     arguments:
       $expandKey: '%grid_api.expand_key%'
