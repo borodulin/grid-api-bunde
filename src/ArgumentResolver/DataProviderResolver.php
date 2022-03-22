@@ -11,6 +11,8 @@ use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortFactory;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -24,8 +26,10 @@ class DataProviderResolver implements ArgumentValueResolverInterface
     private PaginationFactory $paginationRequestFactory;
     private ScenarioInterface $scenario;
     private ServiceValueResolver $serviceValueResolver;
+    private ContainerInterface $container;
 
     public function __construct(
+        ContainerInterface $container,
         ScenarioInterface $scenario,
         SortFactory $sortRequestFactory,
         ExpandFactory $expandRequestFactory,
@@ -39,6 +43,7 @@ class DataProviderResolver implements ArgumentValueResolverInterface
         $this->paginationRequestFactory = $paginationRequestFactory;
         $this->scenario = $scenario;
         $this->serviceValueResolver = $serviceValueResolver;
+        $this->container = $container;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
@@ -57,10 +62,7 @@ class DataProviderResolver implements ArgumentValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        $service = null;
-        foreach ($this->serviceValueResolver->resolve($request, $argument) as $item) {
-            $service = $item;
-        }
+        $service = $this->getService($request, $argument);
         if ($service instanceof DataProviderDecorator) {
             yield $service;
         } elseif ($service instanceof DataProviderInterface) {
@@ -79,5 +81,23 @@ class DataProviderResolver implements ArgumentValueResolverInterface
         } else {
             throw new \InvalidArgumentException();
         }
+    }
+
+    private function getService(Request $request, ArgumentMetadata $argument): object
+    {
+        if (\is_array($controller = $request->attributes->get('_controller'))) {
+            $controller = $controller[0] . '::' . $controller[1];
+        }
+
+        if ('\\' === $controller[0]) {
+            $controller = ltrim($controller, '\\');
+        }
+
+        if (!$this->container->has($controller)) {
+            $i = strrpos($controller, ':');
+            $controller = substr($controller, 0, $i) . strtolower(substr($controller, $i));
+        }
+
+        return $this->container->get($controller)->get($argument->getName());
     }
 }

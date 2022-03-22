@@ -34,6 +34,8 @@ services:
   Borodulin\Bundle\GridApiBundle\ArgumentResolver\DataProviderResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
+    arguments:
+      $container: '@argument_resolver.controller_locator'
 
   Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory:
     arguments:
