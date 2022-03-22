@@ -12,9 +12,7 @@ use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortFactory;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
@@ -25,7 +23,6 @@ class DataProviderResolver implements ArgumentValueResolverInterface
     private FilterFactory $filterRequestFactory;
     private PaginationFactory $paginationRequestFactory;
     private ScenarioInterface $scenario;
-    private ServiceValueResolver $serviceValueResolver;
     private ContainerInterface $container;
 
     public function __construct(
@@ -34,16 +31,14 @@ class DataProviderResolver implements ArgumentValueResolverInterface
         SortFactory $sortRequestFactory,
         ExpandFactory $expandRequestFactory,
         FilterFactory $filterRequestFactory,
-        PaginationFactory $paginationRequestFactory,
-        ServiceValueResolver $serviceValueResolver
+        PaginationFactory $paginationRequestFactory
     ) {
+        $this->container = $container;
         $this->sortRequestFactory = $sortRequestFactory;
         $this->expandRequestFactory = $expandRequestFactory;
         $this->filterRequestFactory = $filterRequestFactory;
         $this->paginationRequestFactory = $paginationRequestFactory;
         $this->scenario = $scenario;
-        $this->serviceValueResolver = $serviceValueResolver;
-        $this->container = $container;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
