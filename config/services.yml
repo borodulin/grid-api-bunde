@@ -31,12 +31,6 @@ services:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
 
-  Borodulin\Bundle\GridApiBundle\ArgumentResolver\DataProviderResolver:
-    tags:
-      - { name: controller.argument_value_resolver, priority: 50 }
-    arguments:
-      $container: '@argument_resolver.controller_locator'
-
   Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory:
     arguments:
       $expandKey: '%grid_api.expand_key%'
@@ -86,9 +80,3 @@ services:
   grid_api_bundle.entity_converter_normalizer:
     class: Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer
     tags: [ serializer.normalizer ]
-
-  grid_api_bundle.entity_data_provider_normalizer:
-    class: Borodulin\Bundle\GridApiBundle\Serializer\DataProviderNormalizer
-    tags: [ serializer.normalizer ]
-    arguments:
-      $normalizer: '@grid_api_bundle.entity_converter_normalizer'
