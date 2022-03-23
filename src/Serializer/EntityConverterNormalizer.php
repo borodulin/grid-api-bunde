@@ -11,14 +11,17 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
-class EntityConverterNormalizer implements NormalizerInterface
+class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     private EntityConverterRegistry $entityConverterRegistry;
     private ScenarioInterface $scenario;
     private PropertyAccessorInterface $propertyAccessor;
     private PropertyListExtractorInterface $propertyListExtractor;
     private MetadataRegistry $metadataRegistry;
+    private NormalizerInterface $normalizer;
 
     public function __construct(
         EntityConverterRegistry $entityConverterRegistry,
@@ -41,8 +44,8 @@ class EntityConverterNormalizer implements NormalizerInterface
     {
         $result = $this->expand(
             $object,
-            $context['expand'] ?? [],
-            $context['scenario'] ?? $this->scenario
+            $format,
+            $context
         );
 
         return \count($result) ? $result : new \ArrayObject();
@@ -62,9 +65,12 @@ class EntityConverterNormalizer implements NormalizerInterface
 
     public function expand(
         object $object,
-        array $expand,
-        ScenarioInterface $scenario
+        string $format = null,
+        array $context = []
     ): array {
+        $expand = $context['expand'] ?? [];
+        $scenario = $context['scenario'] ?? $this->scenario;
+
         $data = [];
 
         $class = \get_class($object);
@@ -149,7 +155,7 @@ class EntityConverterNormalizer implements NormalizerInterface
         }
 
         foreach ($expandTree as $expandName => $nestedExpand) {
-            $nestedExpand = array_values($nestedExpand);
+            $context['expand'] = array_values($nestedExpand);
             if (\array_key_exists($expandName, $expandableNormalized)) {
                 $expandableField = $expandableNormalized[$expandName];
                 if (\is_string($expandableField)) {
@@ -161,17 +167,17 @@ class EntityConverterNormalizer implements NormalizerInterface
                                 $result[$expandName] = null;
                             } elseif ($multiple) {
                                 if ($value instanceof Collection) {
-                                    $value = $value->toArray();
+                                    $value = $this->normalizer->normalize($value->toArray(), $format, $context);
                                 }
                                 $result[$expandName] = array_map(
-                                    fn ($association) => $this->expand($association, $nestedExpand, $scenario),
+                                    fn ($association) => $this->expand($association, $format, $context),
                                     $value
                                 );
                             } else {
-                                $result[$expandName] = $this->expand($value, $nestedExpand, $scenario);
+                                $result[$expandName] = $this->expand($value, $format, $context);
                             }
                         } else {
-                            $result[$expandName] = $value;
+                            $result[$expandName] = $this->normalizer->normalize($value, $format, $context);
                         }
                     }
                 } elseif (\is_callable($expandableField)) {
@@ -179,19 +185,24 @@ class EntityConverterNormalizer implements NormalizerInterface
                     if (\is_object($value)) {
                         if ($value instanceof Collection) {
                             $result[$expandName] = array_map(
-                                fn ($association) => $this->expand($association, $nestedExpand, $scenario),
+                                fn ($association) => $this->expand($association, $format, $context),
                                 $value->toArray()
                             );
                         } else {
-                            $result[$expandName] = $this->expand($value, $nestedExpand, $scenario);
+                            $result[$expandName] = $this->expand($value, $format, $context);
                         }
                     } else {
-                        $result[$expandName] = $value;
+                        $result[$expandName] = $this->normalizer->normalize($value, $format, $context);
                     }
                 }
             }
         }
 
         return $result;
+    }
+
+    public function setSerializer(SerializerInterface $serializer): void
+    {
+        $this->normalizer = $serializer;
     }
 }
