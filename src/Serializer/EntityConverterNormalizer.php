@@ -167,7 +167,7 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
                                 $result[$expandName] = null;
                             } elseif ($multiple) {
                                 if ($value instanceof Collection) {
-                                    $value = $this->normalizer->normalize($value->toArray(), $format, $context);
+                                    $value = $value->toArray();
                                 }
                                 $result[$expandName] = array_map(
                                     fn ($association) => $this->expand($association, $format, $context),
