@@ -14,7 +14,7 @@ class EntityConverterFactoryPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $converters = [];
-        foreach ($container->findTaggedServiceIds('grid_api.entity_converter', true) as $serviceId) {
+        foreach ($container->findTaggedServiceIds('grid_api.entity_converter', true) as $serviceId => $tags) {
             $definition = $container->getDefinition($serviceId);
             $class = $definition->getClass();
             $reflection = new \ReflectionClass($class);
