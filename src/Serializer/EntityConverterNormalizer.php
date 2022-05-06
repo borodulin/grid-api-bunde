@@ -94,7 +94,7 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
         }
 
         if (\is_object($converted)) {
-            foreach ($this->propertyListExtractor->getProperties($class) as $property) {
+            foreach ($this->propertyListExtractor->getProperties(\get_class($converted)) as $property) {
                 if ($this->propertyAccessor->isReadable($converted, $property)) {
                     $data[$property] = $this->propertyAccessor->getValue($converted, $property);
                 }
