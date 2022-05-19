@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
-use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterInterface;
@@ -22,7 +21,7 @@ interface GridApiInterface
 
     public function setExpand(?ExpandInterface $expand): self;
 
-    public function setScenario(ScenarioInterface $scenario): self;
+    public function setContext(array $context): self;
 
     public function paginate(
         DataProviderInterface $dataProvider

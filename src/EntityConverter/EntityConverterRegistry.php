@@ -9,39 +9,30 @@ use Doctrine\Persistence\Proxy;
 class EntityConverterRegistry
 {
     private array $converters = [];
-    private ScenarioInterface $defaultScenario;
 
     /**
-     * @param EntityConverterInterface[]|CustomScenarioInterface[] $converters
+     * @param EntityConverterInterface[] $converters
      */
     public function __construct(
-        ScenarioInterface $defaultScenario,
         array $converters = []
     ) {
-        $this->defaultScenario = $defaultScenario;
         foreach ($converters as $class => $converter) {
-            $scenario = is_subclass_of($converter, CustomScenarioInterface::class) ?
-                $converter->getScenario() : $this->defaultScenario;
-            $this->converters[$scenario->getName()][$class] = $converter;
+            $this->converters[$class] = $converter;
         }
     }
 
-    public function getConverterForClass(string $class, ?ScenarioInterface $scenario = null): ?EntityConverterInterface
+    public function getConverterForClass(string $class): ?EntityConverterInterface
     {
         if (is_subclass_of($class, Proxy::class)) {
             $class = get_parent_class($class);
         }
-        return null === $scenario
-            ? $this->converters[$this->defaultScenario->getName()][$class] ?? null
-            : $this->converters[$scenario->getName()][$class]
-                ?? $this->converters[$this->defaultScenario->getName()][$class]
-                ?? null;
+        return $this->converters[$class] ?? null;
     }
 
-    public function getCustomExpandFieldsForClass(string $class, ?ScenarioInterface $scenario = null): ?CustomExpandInterface
+    public function getCustomExpandFieldsForClass(string $class): ?CustomExpandInterface
     {
-        $converter = $this->getConverterForClass($class, $scenario);
+        $converter = $this->getConverterForClass($class);
 
-        return $converter && $converter instanceof CustomExpandInterface ? $converter : null;
+        return $converter instanceof CustomExpandInterface ? $converter : null;
     }
 }

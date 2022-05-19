@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
-use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
@@ -27,16 +26,14 @@ class GridApi implements GridApiInterface
     private ?PaginationInterface $pagination = null;
     private ?ExpandInterface $expand = null;
     private PaginationFactory $paginationRequestFactory;
-    private ScenarioInterface $scenario;
     private NormalizerInterface $normalizer;
+    private array $context = [];
 
     public function __construct(
-        ScenarioInterface $scenario,
         NormalizerInterface $normalizer,
         PaginationFactory $paginationRequestFactory
     ) {
         $this->paginationRequestFactory = $paginationRequestFactory;
-        $this->scenario = $scenario;
         $this->normalizer = $normalizer;
     }
 
@@ -68,9 +65,9 @@ class GridApi implements GridApiInterface
         return $this;
     }
 
-    public function setScenario(ScenarioInterface $scenario): GridApiInterface
+    public function setContext(array $context): GridApiInterface
     {
-        $this->scenario = $scenario;
+        $this->context = $context;
 
         return $this;
     }
@@ -103,14 +100,14 @@ class GridApi implements GridApiInterface
 
         $queryBuilder = $this->prepareQueryBuilder($dataProvider);
 
+        $context = $this->context;
+        $context['expand'] = null !== $this->expand ? $this->expand->getExpand() : [];
+
         return (new Paginator())
             ->paginate(
                 $pagination,
                 $queryBuilder,
-                fn ($entity) => $this->normalizer->normalize($entity, null, [
-                    'expand' => null !== $this->expand ? $this->expand->getExpand() : [],
-                    'scenario' => $this->scenario,
-                ])
+                fn ($entity) => $this->normalizer->normalize($entity, null, $context)
             );
     }
 
@@ -118,11 +115,11 @@ class GridApi implements GridApiInterface
     {
         $queryBuilder = $this->prepareQueryBuilder($dataProvider);
 
+        $context = $this->context;
+        $context['expand'] = null !== $this->expand ? $this->expand->getExpand() : [];
+
         return array_map(
-            fn ($entity) => $this->normalizer->normalize($entity, null, [
-                'expand' => null !== $this->expand ? $this->expand->getExpand() : [],
-                'scenario' => $this->scenario,
-            ]),
+            fn ($entity) => $this->normalizer->normalize($entity, null, $context),
             $queryBuilder->fetchAll()
         );
     }

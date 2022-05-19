@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
 
-use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterFactory;
 use Borodulin\Bundle\GridApiBundle\GridApi\GridApi;
@@ -18,7 +17,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class GridApiResolver implements ArgumentValueResolverInterface
 {
-    private ScenarioInterface $scenario;
     private NormalizerInterface $normalizer;
     private SortFactory $sortRequestFactory;
     private ExpandFactory $expandRequestFactory;
@@ -26,14 +24,12 @@ class GridApiResolver implements ArgumentValueResolverInterface
     private PaginationFactory $paginationRequestFactory;
 
     public function __construct(
-        ScenarioInterface $scenario,
         NormalizerInterface $normalizer,
         SortFactory $sortRequestFactory,
         ExpandFactory $expandRequestFactory,
         FilterFactory $filterRequestFactory,
         PaginationFactory $paginationRequestFactory
     ) {
-        $this->scenario = $scenario;
         $this->normalizer = $normalizer;
         $this->sortRequestFactory = $sortRequestFactory;
         $this->expandRequestFactory = $expandRequestFactory;
@@ -63,7 +59,6 @@ class GridApiResolver implements ArgumentValueResolverInterface
         $filter = $this->filterRequestFactory->tryCreateFromInputBug($request->query);
 
         yield (new GridApi(
-            $this->scenario,
             $this->normalizer,
             $this->paginationRequestFactory
         ))

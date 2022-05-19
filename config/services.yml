@@ -70,13 +70,6 @@ services:
 
   Borodulin\Bundle\GridApiBundle\GridApi\GridApiInterface: '@grid_api_bundle.entity_converter.grid_api'
 
-  grid_api_bundle.entity_converter.scenario:
-    class: Borodulin\Bundle\GridApiBundle\EntityConverter\Scenario
-    arguments:
-      $name: 'default'
-
-  Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface: '@grid_api_bundle.entity_converter.scenario'
-
   grid_api_bundle.entity_converter_normalizer:
     class: Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer
     tags: [ serializer.normalizer ]

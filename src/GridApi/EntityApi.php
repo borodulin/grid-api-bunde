@@ -4,27 +4,24 @@ declare(strict_types=1);
 
 namespace Borodulin\Bundle\GridApiBundle\GridApi;
 
-use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class EntityApi implements EntityApiInterface
 {
-    private ScenarioInterface $scenario;
     private ?ExpandInterface $expand = null;
     private NormalizerInterface $normalizer;
+    private array $context = [];
 
     public function __construct(
-        NormalizerInterface $normalizer,
-        ScenarioInterface $scenario
+        NormalizerInterface $normalizer
     ) {
-        $this->scenario = $scenario;
         $this->normalizer = $normalizer;
     }
 
-    public function setScenario(ScenarioInterface $scenario): EntityApiInterface
+    public function setContext(array $context): EntityApiInterface
     {
-        $this->scenario = $scenario;
+        $this->context = $context;
 
         return $this;
     }
@@ -40,9 +37,9 @@ class EntityApi implements EntityApiInterface
     {
         $expand = $this->expand ? $this->expand->getExpand() : [];
 
-        return $this->normalizer->normalize($entity, null, [
-            'expand' => $expand,
-            'scenario' => $this->scenario,
-        ]);
+        $context = $this->context;
+        $context['expand'] = $expand;
+
+        return $this->normalizer->normalize($entity, null, $context);
     }
 }

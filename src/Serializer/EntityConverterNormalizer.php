@@ -6,10 +6,10 @@ namespace Borodulin\Bundle\GridApiBundle\Serializer;
 
 use Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry;
 use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
-use Borodulin\Bundle\GridApiBundle\EntityConverter\ScenarioInterface;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -17,24 +17,24 @@ use Symfony\Component\Serializer\SerializerInterface;
 class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     private EntityConverterRegistry $entityConverterRegistry;
-    private ScenarioInterface $scenario;
     private PropertyAccessorInterface $propertyAccessor;
     private PropertyListExtractorInterface $propertyListExtractor;
     private MetadataRegistry $metadataRegistry;
     private NormalizerInterface $normalizer;
+    private NameConverterInterface $nameConverter;
 
     public function __construct(
         EntityConverterRegistry $entityConverterRegistry,
         PropertyAccessorInterface $propertyAccessor,
         PropertyListExtractorInterface $propertyListExtractor,
-        ScenarioInterface $scenario,
-        MetadataRegistry $metadataRegistry
+        MetadataRegistry $metadataRegistry,
+        NameConverterInterface $nameConverter
     ) {
         $this->entityConverterRegistry = $entityConverterRegistry;
-        $this->scenario = $scenario;
         $this->propertyAccessor = $propertyAccessor;
         $this->propertyListExtractor = $propertyListExtractor;
         $this->metadataRegistry = $metadataRegistry;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -69,19 +69,19 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
         array $context = []
     ): array {
         $expand = $context['expand'] ?? [];
-        $scenario = $context['scenario'] ?? $this->scenario;
+        $nameConverter = isset($context['name_converter'])
+            && $context['name_converter'] instanceof NameConverterInterface
+            ? $context['name_converter'] : $this->nameConverter;
 
         $data = [];
 
         $class = \get_class($object);
 
-        $nameConverter = $scenario->getNameConverter();
-
-        $converter = $this->entityConverterRegistry->getConverterForClass($class, $scenario);
+        $converter = $this->entityConverterRegistry->getConverterForClass($class);
         $metaData = $this->metadataRegistry->getMetadataForClass($class);
 
         if (null !== $converter && \is_callable($converter)) {
-            $converted = \call_user_func($converter, $object, $scenario);
+            $converted = \call_user_func($converter, $object, $context);
         } elseif (null !== $metaData) {
             $converted = [];
             foreach ($metaData->getFieldNames() as $fieldName) {
@@ -110,7 +110,7 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
 
         $class = \get_class($object);
         $metaData = $this->metadataRegistry->getMetadataForClass($class);
-        $customExpandFields = $this->entityConverterRegistry->getCustomExpandFieldsForClass($class, $scenario);
+        $customExpandFields = $this->entityConverterRegistry->getCustomExpandFieldsForClass($class);
 
         $expandable = [];
         if (null !== $customExpandFields) {
@@ -121,7 +121,6 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
         if (!\count($expandable)) {
             return [];
         }
-        $nameConverter = $scenario->getNameConverter();
         $expandableNormalized = [];
         foreach ($expandable as $key => $value) {
             if (\is_string($key) && (\is_string($value) || \is_callable($value))) {
@@ -181,7 +180,7 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
                         }
                     }
                 } elseif (\is_callable($expandableField)) {
-                    $value = \call_user_func($expandableField, $object, $scenario);
+                    $value = \call_user_func($expandableField, $object, $context);
                     if (\is_object($value)) {
                         if ($value instanceof Collection) {
                             $result[$expandName] = array_map(
