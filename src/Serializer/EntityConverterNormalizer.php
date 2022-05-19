@@ -28,13 +28,13 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
         PropertyAccessorInterface $propertyAccessor,
         PropertyListExtractorInterface $propertyListExtractor,
         MetadataRegistry $metadataRegistry,
-        NameConverterInterface $nameConverter
+        ?NameConverterInterface $nameConverter = null
     ) {
         $this->entityConverterRegistry = $entityConverterRegistry;
         $this->propertyAccessor = $propertyAccessor;
         $this->propertyListExtractor = $propertyListExtractor;
         $this->metadataRegistry = $metadataRegistry;
-        $this->nameConverter = $nameConverter;
+        $this->nameConverter = $nameConverter ?? new DummyNameConverter();
     }
 
     /**
