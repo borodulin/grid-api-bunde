@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle;
+namespace Borodulin\GridApiBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Borodulin\Bundle\GridApiBundle\DependencyInjection\ApiExtension;
-use Borodulin\Bundle\GridApiBundle\DependencyInjection\EntityConverterFactoryPass;
+use Borodulin\GridApiBundle\DependencyInjection\GridApiExtension;
+use Borodulin\GridApiBundle\DependencyInjection\EntityConverterFactoryPass;
 
 class GridApiBundle extends Bundle
 {
@@ -21,6 +21,6 @@ class GridApiBundle extends Bundle
 
     public function getContainerExtension(): ExtensionInterface
     {
-        return new ApiExtension();
+        return new GridApiExtension();
     }
 }

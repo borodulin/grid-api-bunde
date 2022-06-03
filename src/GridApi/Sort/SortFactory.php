@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\Sort;
+namespace Borodulin\GridApiBundle\GridApi\Sort;
 
 use Symfony\Component\HttpFoundation\InputBag;
 

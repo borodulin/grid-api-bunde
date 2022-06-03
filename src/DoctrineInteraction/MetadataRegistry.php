@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\DoctrineInteraction;
+namespace Borodulin\GridApiBundle\DoctrineInteraction;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;

@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi;
+namespace Borodulin\GridApiBundle\GridApi;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\QueryBuilderInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterBuilder;
-use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationFactory;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationResponseInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\Paginator;
-use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortBuilder;
-use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\QueryBuilderInterface;
+use Borodulin\GridApiBundle\GridApi\Expand\ExpandInterface;
+use Borodulin\GridApiBundle\GridApi\Filter\FilterBuilder;
+use Borodulin\GridApiBundle\GridApi\Filter\FilterInterface;
+use Borodulin\GridApiBundle\GridApi\Pagination\PaginationFactory;
+use Borodulin\GridApiBundle\GridApi\Pagination\PaginationInterface;
+use Borodulin\GridApiBundle\GridApi\Pagination\PaginationResponseInterface;
+use Borodulin\GridApiBundle\GridApi\Pagination\Paginator;
+use Borodulin\GridApiBundle\GridApi\Sort\SortBuilder;
+use Borodulin\GridApiBundle\GridApi\Sort\SortInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class GridApi implements GridApiInterface

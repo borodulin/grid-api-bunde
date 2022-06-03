@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\DataProvider;
+namespace Borodulin\GridApiBundle\GridApi\DataProvider;
 
 interface SortQueryBuilderInterface
 {

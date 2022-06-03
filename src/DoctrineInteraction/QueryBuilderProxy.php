@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\DoctrineInteraction;
+namespace Borodulin\GridApiBundle\DoctrineInteraction;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\QueryBuilderInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\QueryBuilderInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;

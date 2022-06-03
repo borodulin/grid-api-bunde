@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi;
+namespace Borodulin\GridApiBundle\GridApi;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationResponseInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
+use Borodulin\GridApiBundle\GridApi\Expand\ExpandInterface;
+use Borodulin\GridApiBundle\GridApi\Filter\FilterInterface;
+use Borodulin\GridApiBundle\GridApi\Pagination\PaginationInterface;
+use Borodulin\GridApiBundle\GridApi\Pagination\PaginationResponseInterface;
+use Borodulin\GridApiBundle\GridApi\Sort\SortInterface;
 
 interface GridApiInterface
 {

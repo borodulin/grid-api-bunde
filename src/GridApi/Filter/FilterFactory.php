@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\Filter;
+namespace Borodulin\GridApiBundle\GridApi\Filter;
 
 use Symfony\Component\HttpFoundation\InputBag;
 

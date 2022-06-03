@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi;
+namespace Borodulin\GridApiBundle\GridApi;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandInterface;
+use Borodulin\GridApiBundle\GridApi\Expand\ExpandInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class EntityApi implements EntityApiInterface

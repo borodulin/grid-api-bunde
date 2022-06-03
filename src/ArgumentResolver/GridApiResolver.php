@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
+namespace Borodulin\GridApiBundle\ArgumentResolver;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory;
-use Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterFactory;
-use Borodulin\Bundle\GridApiBundle\GridApi\GridApi;
-use Borodulin\Bundle\GridApiBundle\GridApi\GridApiInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationFactory;
-use Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortFactory;
+use Borodulin\GridApiBundle\GridApi\Expand\ExpandFactory;
+use Borodulin\GridApiBundle\GridApi\Filter\FilterFactory;
+use Borodulin\GridApiBundle\GridApi\GridApi;
+use Borodulin\GridApiBundle\GridApi\GridApiInterface;
+use Borodulin\GridApiBundle\GridApi\Pagination\PaginationFactory;
+use Borodulin\GridApiBundle\GridApi\Sort\SortFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

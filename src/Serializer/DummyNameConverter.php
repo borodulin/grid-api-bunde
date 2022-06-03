@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\Serializer;
+namespace Borodulin\GridApiBundle\Serializer;
 
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 

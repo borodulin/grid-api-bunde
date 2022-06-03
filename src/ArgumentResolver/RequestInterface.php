@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
+namespace Borodulin\GridApiBundle\ArgumentResolver;
 
 interface RequestInterface
 {

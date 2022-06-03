@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\Exception;
+namespace Borodulin\GridApiBundle\Exception;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 

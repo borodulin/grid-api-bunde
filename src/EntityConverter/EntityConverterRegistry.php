@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\EntityConverter;
+namespace Borodulin\GridApiBundle\EntityConverter;
 
 use Doctrine\Persistence\Proxy;
 

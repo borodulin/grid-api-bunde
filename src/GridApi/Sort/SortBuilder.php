@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\Sort;
+namespace Borodulin\GridApiBundle\GridApi\Sort;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\SortQueryBuilderInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\SortQueryBuilderInterface;
 
 class SortBuilder
 {

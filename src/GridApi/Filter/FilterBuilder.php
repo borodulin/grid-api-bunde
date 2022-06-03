@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\Filter;
+namespace Borodulin\GridApiBundle\GridApi\Filter;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\FilterQueryBuilderInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\FilterQueryBuilderInterface;
 
 class FilterBuilder
 {

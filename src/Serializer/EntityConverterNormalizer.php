@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\Serializer;
+namespace Borodulin\GridApiBundle\Serializer;
 
-use Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry;
-use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
+use Borodulin\GridApiBundle\DoctrineInteraction\MetadataRegistry;
+use Borodulin\GridApiBundle\EntityConverter\EntityConverterRegistry;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;

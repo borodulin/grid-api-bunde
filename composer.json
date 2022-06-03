@@ -31,7 +31,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Borodulin\\Bundle\\GridApiBundle\\": "src/"
+            "Borodulin\\GridApiBundle\\": "src/"
         }
     },
     "conflict": {

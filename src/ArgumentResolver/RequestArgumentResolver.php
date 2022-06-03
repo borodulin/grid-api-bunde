@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
+namespace Borodulin\GridApiBundle\ArgumentResolver;
 
-use Borodulin\Bundle\GridApiBundle\Exception\ValidationException;
+use Borodulin\GridApiBundle\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

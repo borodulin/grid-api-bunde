@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\DependencyInjection;
+namespace Borodulin\GridApiBundle\DependencyInjection;
 
-use Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry;
+use Borodulin\GridApiBundle\EntityConverter\EntityConverterRegistry;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;

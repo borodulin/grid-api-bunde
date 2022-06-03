@@ -17,35 +17,35 @@ services:
   _defaults:
     autowire: true
 
-  Borodulin\Bundle\GridApiBundle\ArgumentResolver\EntityApiResolver:
+  Borodulin\GridApiBundle\ArgumentResolver\EntityApiResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
     arguments:
       $normalizer: '@serializer'
 
-  Borodulin\Bundle\GridApiBundle\ArgumentResolver\GridApiResolver:
+  Borodulin\GridApiBundle\ArgumentResolver\GridApiResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
 
-  Borodulin\Bundle\GridApiBundle\ArgumentResolver\RequestArgumentResolver:
+  Borodulin\GridApiBundle\ArgumentResolver\RequestArgumentResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
 
-  Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory:
+  Borodulin\GridApiBundle\GridApi\Expand\ExpandFactory:
     arguments:
       $expandKey: '%grid_api.expand_key%'
 
-  Borodulin\Bundle\GridApiBundle\GridApi\Sort\SortFactory:
+  Borodulin\GridApiBundle\GridApi\Sort\SortFactory:
     arguments:
       $sortKey: '%grid_api.sort_key%'
 
-  Borodulin\Bundle\GridApiBundle\GridApi\Pagination\PaginationFactory:
+  Borodulin\GridApiBundle\GridApi\Pagination\PaginationFactory:
     arguments:
       $pageKey: '%grid_api.page_key%'
       $pageSizeKey: '%grid_api.page_size_key%'
       $defaultPageSize: '%grid_api.default_page_size%'
 
-  Borodulin\Bundle\GridApiBundle\GridApi\Filter\FilterFactory:
+  Borodulin\GridApiBundle\GridApi\Filter\FilterFactory:
     arguments:
       $ignored:
         - '%grid_api.sort_key%'
@@ -53,23 +53,23 @@ services:
         - '%grid_api.page_key%'
         - '%grid_api.page_size_key%'
 
-  Borodulin\Bundle\GridApiBundle\EntityConverter\EntityConverterRegistry: ~
-  Borodulin\Bundle\GridApiBundle\DoctrineInteraction\MetadataRegistry: ~
+  Borodulin\GridApiBundle\EntityConverter\EntityConverterRegistry: ~
+  Borodulin\GridApiBundle\DoctrineInteraction\MetadataRegistry: ~
 
-  grid_api_bundle.entity_converter.entity_api:
-    class: Borodulin\Bundle\GridApiBundle\GridApi\EntityApi
+  grid_api.entity_converter.entity_api:
+    class: Borodulin\GridApiBundle\GridApi\EntityApi
     arguments:
       $normalizer: '@serializer'
 
-  Borodulin\Bundle\GridApiBundle\GridApi\EntityApiInterface: '@grid_api_bundle.entity_converter.entity_api'
+  Borodulin\GridApiBundle\GridApi\EntityApiInterface: '@grid_api.entity_converter.entity_api'
 
-  grid_api_bundle.entity_converter.grid_api:
-    class: Borodulin\Bundle\GridApiBundle\GridApi\GridApi
+  grid_api.entity_converter.grid_api:
+    class: Borodulin\GridApiBundle\GridApi\GridApi
     arguments:
       $normalizer: '@grid_api_bundle.entity_converter_normalizer'
 
-  Borodulin\Bundle\GridApiBundle\GridApi\GridApiInterface: '@grid_api_bundle.entity_converter.grid_api'
+  Borodulin\GridApiBundle\GridApi\GridApiInterface: '@grid_api.entity_converter.grid_api'
 
   grid_api_bundle.entity_converter_normalizer:
-    class: Borodulin\Bundle\GridApiBundle\Serializer\EntityConverterNormalizer
+    class: Borodulin\GridApiBundle\Serializer\EntityConverterNormalizer
     tags: [ serializer.normalizer ]

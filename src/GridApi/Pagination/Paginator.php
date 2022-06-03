@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\Pagination;
+namespace Borodulin\GridApiBundle\GridApi\Pagination;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\DataProvider\PaginationQueryBuilderInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\PaginationQueryBuilderInterface;
 
 class Paginator
 {

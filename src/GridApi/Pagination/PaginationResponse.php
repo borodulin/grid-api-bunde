@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\Pagination;
+namespace Borodulin\GridApiBundle\GridApi\Pagination;
 
 class PaginationResponse implements PaginationResponseInterface
 {

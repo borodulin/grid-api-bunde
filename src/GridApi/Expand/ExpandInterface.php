@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\GridApi\Expand;
+namespace Borodulin\GridApiBundle\GridApi\Expand;
 
 interface ExpandInterface
 {

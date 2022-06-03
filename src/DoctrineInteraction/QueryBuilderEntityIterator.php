@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\DoctrineInteraction;
+namespace Borodulin\GridApiBundle\DoctrineInteraction;
 
-use Borodulin\Bundle\GridApiBundle\Serializer\LowerCaseNameConverter;
+use Borodulin\GridApiBundle\Serializer\LowerCaseNameConverter;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Expr\Join;

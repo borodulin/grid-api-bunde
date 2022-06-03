@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Borodulin\Bundle\GridApiBundle\ArgumentResolver;
+namespace Borodulin\GridApiBundle\ArgumentResolver;
 
-use Borodulin\Bundle\GridApiBundle\GridApi\EntityApi;
-use Borodulin\Bundle\GridApiBundle\GridApi\EntityApiInterface;
-use Borodulin\Bundle\GridApiBundle\GridApi\Expand\ExpandFactory;
+use Borodulin\GridApiBundle\GridApi\EntityApi;
+use Borodulin\GridApiBundle\GridApi\EntityApiInterface;
+use Borodulin\GridApiBundle\GridApi\Expand\ExpandFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
