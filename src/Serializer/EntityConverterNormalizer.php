@@ -119,7 +119,7 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
             $expandable = $metaData->getAssociationNames();
         }
         if (!\count($expandable)) {
-            return [];
+            return $result;
         }
         $expandableNormalized = [];
         foreach ($expandable as $key => $value) {
