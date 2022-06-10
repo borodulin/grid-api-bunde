@@ -82,7 +82,7 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         $errors = $this->validator->validate($instance, null, ['Default', $request->getMethod()]);
         if ($errors->count()) {
             foreach ($errors as $error) {
-                $violations[$error->getPropertyPath()][] = $error->getMessage();
+                $this->putErrorAtPropertyPath($violations, $error->getPropertyPath(), $error->getMessage());
             }
         }
         if (\count($violations)) {
@@ -90,6 +90,29 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         }
 
         yield $instance;
+    }
+
+    private function putErrorAtPropertyPath(array &$violations, string $propertyPath, string $errorMessage): void
+    {
+        $pointer = &$violations;
+        foreach (explode('.', $propertyPath) as $item) {
+            $index = null;
+            if (preg_match('/(\w+)\[(\d+)]/', $item, $matches)) {
+                $item = $matches[1];
+                $index = (int) $matches[2];
+            }
+            if (!isset($pointer[$item])) {
+                $pointer[$item] = [];
+            }
+            if (null !== $index && !isset($pointer[$item][$index])) {
+                $pointer[$item][$index] = [];
+            }
+            $pointer = &$pointer[$item];
+            if (null !== $index) {
+                $pointer = &$pointer[$index];
+            }
+        }
+        $pointer[] = $errorMessage;
     }
 
     private function validateProperties(string $class, array $normalData, array $groups): array
