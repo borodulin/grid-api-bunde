@@ -67,25 +67,7 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
             $normalData = $request->query->all();
         }
 
-        $violations = [];
-        $metadata = $this->validator->getMetadataFor($argument->getType());
-        $reflection = new \ReflectionClass($argument->getType());
-        $instance = $reflection->newInstanceWithoutConstructor();
-        if ($metadata instanceof ClassMetadata) {
-            foreach ($metadata->getConstrainedProperties() as $property) {
-                $errors = $this->validator->validatePropertyValue(
-                    $instance,
-                    $property,
-                    $normalData[$property] ?? null,
-                    ['Default', $request->getMethod()]
-                );
-                if ($errors->count()) {
-                    foreach ($errors as $error) {
-                        $violations[$error->getPropertyPath()][] = $error->getMessage();
-                    }
-                }
-            }
-        }
+        $violations = $this->validateProperties($argument->getType(), ['Default', $request->getMethod()]);
         if (\count($violations)) {
             throw new ValidationException($violations);
         }
@@ -95,5 +77,35 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
             $argument->getType(),
             'xml'
         );
+    }
+
+    private function validateProperties(string $class, array $groups): array
+    {
+        $violations = [];
+        $metadata = $this->validator->getMetadataFor($class);
+        $reflection = new \ReflectionClass($class);
+        $instance = $reflection->newInstanceWithoutConstructor();
+        if ($metadata instanceof ClassMetadata) {
+            foreach ($metadata->getConstrainedProperties() as $property) {
+                $propertyMetadata = $metadata->getPropertyMetadata($property);
+                if ($propertyMetadata instanceof ClassMetadata) {
+                    $violations[$property] = $this->validateProperties($propertyMetadata->getClassName(), $groups);
+                }
+                $errors = $this->validator->validatePropertyValue(
+                    $instance,
+                    $property,
+                    $normalData[$property] ?? null,
+                    $groups
+                );
+                if ($errors->count()) {
+                    foreach ($errors as $error) {
+                        $violations[$property][] = $error->getMessage();
+                    }
+                }
+
+            }
+        }
+
+        return $violations;
     }
 }
