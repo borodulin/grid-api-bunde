@@ -67,7 +67,7 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
             $normalData = $request->query->all();
         }
 
-        $violations = $this->validateProperties($argument->getType(), ['Default', $request->getMethod()]);
+        $violations = $this->validateProperties($argument->getType(), $normalData, ['Default', $request->getMethod()]);
         if (\count($violations)) {
             throw new ValidationException($violations);
         }
@@ -92,7 +92,7 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         yield $instance;
     }
 
-    private function validateProperties(string $class, array $groups): array
+    private function validateProperties(string $class, array $normalData, array $groups): array
     {
         $violations = [];
         $metadata = $this->validator->getMetadataFor($class);
@@ -116,7 +116,7 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
                     if (null !== $propertyType) {
                         $typeName = $propertyType->getName();
                         if (class_exists($typeName) && $this->validator->hasMetadataFor($typeName)) {
-                            $violations[$property] = $this->validateProperties($propertyType->getName(), $groups);
+                            $violations[$property] = $this->validateProperties($propertyType->getName(), $normalData[$property] ?? [], $groups);
                         }
                     }
                 }
