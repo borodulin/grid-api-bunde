@@ -115,8 +115,13 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
                     $propertyType = $propertyReflection->getType();
                     if (null !== $propertyType) {
                         $typeName = $propertyType->getName();
-                        if (class_exists($typeName) && $this->validator->hasMetadataFor($typeName)) {
-                            $violations[$property] = $this->validateProperties($propertyType->getName(), $normalData[$property] ?? [], $groups);
+                        if (isset($normalData[$property]) && \is_array($normalData[$property])
+                            && class_exists($typeName) && $this->validator->hasMetadataFor($typeName)
+                        ) {
+                            $propertyViolations = $this->validateProperties($propertyType->getName(), $normalData[$property], $groups);
+                            if (\count($propertyViolations)) {
+                                $violations[$property] = $propertyViolations;
+                            }
                         }
                     }
                 }
