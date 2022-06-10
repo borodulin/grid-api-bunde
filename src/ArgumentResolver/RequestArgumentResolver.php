@@ -72,11 +72,24 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
             throw new ValidationException($violations);
         }
 
-        yield $this->serializer->denormalize(
+        $instance = $this->serializer->denormalize(
             $normalData,
             $argument->getType(),
             'xml'
         );
+
+        $violations = [];
+        $errors = $this->validator->validate($instance, null, ['Default', $request->getMethod()]);
+        if ($errors->count()) {
+            foreach ($errors as $error) {
+                $violations[$error->getPropertyPath()][] = $error->getMessage();
+            }
+        }
+        if (\count($violations)) {
+            throw new ValidationException($violations);
+        }
+
+        yield $instance;
     }
 
     private function validateProperties(string $class, array $groups): array
