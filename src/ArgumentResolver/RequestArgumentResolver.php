@@ -87,10 +87,6 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         $instance = $reflection->newInstanceWithoutConstructor();
         if ($metadata instanceof ClassMetadata) {
             foreach ($metadata->getConstrainedProperties() as $property) {
-                $propertyMetadata = $metadata->getPropertyMetadata($property);
-                if ($propertyMetadata instanceof ClassMetadata) {
-                    $violations[$property] = $this->validateProperties($propertyMetadata->getClassName(), $groups);
-                }
                 $errors = $this->validator->validatePropertyValue(
                     $instance,
                     $property,
@@ -101,8 +97,16 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
                     foreach ($errors as $error) {
                         $violations[$property][] = $error->getMessage();
                     }
+                } else {
+                    $propertyReflection = $reflection->getProperty($property);
+                    $propertyType = $propertyReflection->getType();
+                    if (null !== $propertyType) {
+                        $typeName = $propertyType->getName();
+                        if (class_exists($typeName) && $this->validator->hasMetadataFor($typeName)) {
+                            $violations[$property] = $this->validateProperties($propertyType->getName(), $groups);
+                        }
+                    }
                 }
-
             }
         }
 
