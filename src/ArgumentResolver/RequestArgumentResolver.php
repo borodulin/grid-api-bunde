@@ -66,7 +66,7 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         } else {
             $normalData = $request->query->all();
         }
-        $violations = $this->validateProperties($argument->getType(), $normalData, ['Default', $request->getMethod()]);
+        $violations = $this->validateProperties($argument->getType(), (array) $normalData, ['Default', $request->getMethod()]);
         if (\count($violations)) {
             throw new ValidationException($violations);
         }
