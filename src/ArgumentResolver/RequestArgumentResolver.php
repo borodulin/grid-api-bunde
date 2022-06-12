@@ -59,25 +59,22 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         if ($hasBody) {
             $format = $request->getContentType();
             if ('json' === $format) {
-                $normalData = json_decode($request->getContent(), true);
+                $normalData = $request->toArray();
             } elseif ('form' === $format) {
                 $normalData = $request->request->all();
             }
         } else {
             $normalData = $request->query->all();
         }
-
         $violations = $this->validateProperties($argument->getType(), $normalData, ['Default', $request->getMethod()]);
         if (\count($violations)) {
             throw new ValidationException($violations);
         }
-
         $instance = $this->serializer->denormalize(
             $normalData,
             $argument->getType(),
             'xml'
         );
-
         $violations = [];
         $errors = $this->validator->validate($instance, null, ['Default', $request->getMethod()]);
         if ($errors->count()) {
