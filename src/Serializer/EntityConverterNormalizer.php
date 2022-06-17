@@ -95,7 +95,7 @@ class EntityConverterNormalizer implements NormalizerInterface, SerializerAwareI
 
         if (\is_object($converted)) {
             if ($class !== \get_class($converted)) {
-                $converted = $this->normalizer->normalize($object);
+                $converted = $this->normalizer->normalize($converted);
             }
         }
 
