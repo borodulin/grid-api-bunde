@@ -56,8 +56,8 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         );
 
         $normalData = [];
+        $format = $request->getContentType();
         if ($hasBody) {
-            $format = $request->getContentType();
             if ('json' === $format) {
                 $normalData = $request->toArray();
             } elseif ('form' === $format) {
@@ -73,7 +73,7 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         $instance = $this->serializer->denormalize(
             $normalData,
             $argument->getType(),
-            'json'
+            'json' === $format ? 'json' : 'csv'
         );
         $violations = [];
         $errors = $this->validator->validate($instance, null, ['Default', $request->getMethod()]);
