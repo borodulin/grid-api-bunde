@@ -73,7 +73,7 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
         $instance = $this->serializer->denormalize(
             $normalData,
             $argument->getType(),
-            'xml'
+            'json'
         );
         $violations = [];
         $errors = $this->validator->validate($instance, null, ['Default', $request->getMethod()]);
