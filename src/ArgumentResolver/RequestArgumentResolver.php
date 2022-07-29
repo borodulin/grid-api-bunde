@@ -54,7 +54,6 @@ class RequestArgumentResolver implements ArgumentValueResolverInterface
             [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH],
             true
         );
-
         $normalData = [];
         $format = $request->getContentType();
         if ($hasBody) {
