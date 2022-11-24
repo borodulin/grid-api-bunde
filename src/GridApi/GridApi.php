@@ -7,6 +7,7 @@ namespace Borodulin\GridApiBundle\GridApi;
 use Borodulin\GridApiBundle\GridApi\DataProvider\CustomFilterInterface;
 use Borodulin\GridApiBundle\GridApi\DataProvider\CustomSortInterface;
 use Borodulin\GridApiBundle\GridApi\DataProvider\DataProviderInterface;
+use Borodulin\GridApiBundle\GridApi\DataProvider\ExtraDataInterface;
 use Borodulin\GridApiBundle\GridApi\DataProvider\QueryBuilderInterface;
 use Borodulin\GridApiBundle\GridApi\Expand\ExpandInterface;
 use Borodulin\GridApiBundle\GridApi\Filter\FilterBuilder;
@@ -103,12 +104,18 @@ class GridApi implements GridApiInterface
         $context = $this->context;
         $context['expand'] = null !== $this->expand ? $this->expand->getExpand() : [];
 
-        return (new Paginator())
+        $paginatorResponse = (new Paginator())
             ->paginate(
                 $pagination,
                 $queryBuilder,
                 fn ($entity) => $this->normalizer->normalize($entity, null, $context)
             );
+
+        if ($dataProvider instanceof ExtraDataInterface) {
+            return $dataProvider->processResponse($paginatorResponse);
+        }
+
+        return $paginatorResponse;
     }
 
     public function listAll(DataProviderInterface $dataProvider): array
@@ -118,9 +125,15 @@ class GridApi implements GridApiInterface
         $context = $this->context;
         $context['expand'] = null !== $this->expand ? $this->expand->getExpand() : [];
 
-        return array_map(
+        $listResponse = array_map(
             fn ($entity) => $this->normalizer->normalize($entity, null, $context),
             $queryBuilder->fetchAll()
         );
+
+        if ($dataProvider instanceof ExtraDataInterface) {
+            return $dataProvider->processResponse($listResponse);
+        }
+
+        return $listResponse;
     }
 }
