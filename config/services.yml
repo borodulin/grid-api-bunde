@@ -5,6 +5,7 @@ parameters:
   env(GRID_API_PAGE_KEY): 'page'
   env(GRID_API_PAGE_SIZE_KEY): 'page_size'
   env(GRID_API_DEFAULT_PAGE_SIZE): '25'
+  env(GRID_API_PAGE_START): '0'
 
   grid_api.expand_key: '%env(GRID_API_EXPAND_KEY)%'
   grid_api.filter_key: '%env(GRID_API_FILTER_KEY)%'
@@ -12,6 +13,7 @@ parameters:
   grid_api.page_key: '%env(GRID_API_PAGE_KEY)%'
   grid_api.page_size_key: '%env(GRID_API_PAGE_SIZE_KEY)%'
   grid_api.default_page_size: '%env(int:GRID_API_DEFAULT_PAGE_SIZE)%'
+  grid_api.page_start: '%env(int:GRID_API_PAGE_START)%'
 
 services:
   _defaults:
@@ -44,6 +46,7 @@ services:
       $pageKey: '%grid_api.page_key%'
       $pageSizeKey: '%grid_api.page_size_key%'
       $defaultPageSize: '%grid_api.default_page_size%'
+      $pageStart: '%grid_api.page_start%'
 
   Borodulin\GridApiBundle\GridApi\Filter\FilterFactory:
     arguments:

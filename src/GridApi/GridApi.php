@@ -104,7 +104,7 @@ class GridApi implements GridApiInterface
         $context = $this->context;
         $context['expand'] = null !== $this->expand ? $this->expand->getExpand() : [];
 
-        $paginatorResponse = (new Paginator())
+        $paginatorResponse = (new Paginator($this->paginationRequestFactory->getPageStart()))
             ->paginate(
                 $pagination,
                 $queryBuilder,

@@ -11,28 +11,31 @@ class PaginationFactory
     private string $pageKey;
     private string $pageSizeKey;
     private int $defaultPageSize;
+    private int $pageStart;
 
     public function __construct(
         string $pageKey,
         string $pageSizeKey,
-        int $defaultPageSize
+        int $defaultPageSize,
+        int $pageStart
     ) {
         $this->pageKey = $pageKey;
         $this->pageSizeKey = $pageSizeKey;
         $this->defaultPageSize = $defaultPageSize;
+        $this->pageStart = $pageStart;
     }
 
     public function createFromInputBug(InputBag $inputBag): Pagination
     {
         return new Pagination(
-            $this->getIntegerQueryParam($inputBag, $this->pageKey, 0),
-            $this->getIntegerQueryParam($inputBag, $this->pageSizeKey, $this->defaultPageSize)
+            $this->getIntegerQueryParam($inputBag, $this->pageKey, $this->pageStart),
+            $this->getIntegerQueryParam($inputBag, $this->pageSizeKey, $this->defaultPageSize),
         );
     }
 
     public function createDefault(): Pagination
     {
-        return new Pagination(0, $this->defaultPageSize);
+        return new Pagination($this->pageStart, $this->defaultPageSize);
     }
 
     private function getIntegerQueryParam(InputBag $query, string $name, int $default): int
@@ -45,5 +48,10 @@ class PaginationFactory
         }
 
         return $default;
+    }
+
+    public function getPageStart(): int
+    {
+        return $this->pageStart;
     }
 }

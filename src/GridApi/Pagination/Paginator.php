@@ -8,6 +8,14 @@ use Borodulin\GridApiBundle\GridApi\DataProvider\PaginationQueryBuilderInterface
 
 class Paginator
 {
+    private int $pageStart;
+
+    public function __construct(
+        int $pageStart = 0
+    ) {
+        $this->pageStart = $pageStart;
+    }
+
     public function paginate(
         PaginationInterface $paginationRequest,
         PaginationQueryBuilderInterface $paginationQueryBuilder,
@@ -15,7 +23,7 @@ class Paginator
     ): PaginationResponseInterface {
         $pageSize = $paginationRequest->getPageSize();
         $page = $paginationRequest->getPage();
-        $offset = $page * $pageSize;
+        $offset = ($page - $this->pageStart) * $pageSize;
         $limit = $pageSize;
 
         $paginationQueryBuilder->setLimit($limit);

@@ -7,6 +7,5 @@ namespace Borodulin\GridApiBundle\GridApi\Pagination;
 interface PaginationInterface
 {
     public function getPage(): int;
-
     public function getPageSize(): int;
 }
